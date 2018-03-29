@@ -4,9 +4,16 @@ date=$(date +"%Y%m%d_%H%M")
 file_name=$1
 file=""
 bak="bak"
+old=""
+num=""
 
 if [[ -z "$file_name" ]]; then
   [[ -e "$bak" ]] || mkdir "$bak"
+  num=$(ls -l "$bak" |grep "^-"|wc -l)
+  [[ num -le 3 ]] || {
+    old=$(ls -1 "$bak" | head -n 1)
+    rm -f "$bak"/"$old"
+  }
   mv ./*.pdf "$bak"
   enscript tbt_cases.sh -o - | ps2pdf - tbt_cases_"$date".pdf
   sleep 1
