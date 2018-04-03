@@ -1,0 +1,28 @@
+#!/bin/bash
+
+version=
+[[ $1 =~ ^v[1-9]$ ]] && {
+	version=" $1"
+	shift
+}
+
+repo="tbt_cases"
+
+files=$(git format-patch -M --subject-prefix="PATCH$version $repo" "${@:--1}")
+
+for file in $files
+do
+	[[ -f /tmp/$file ]] && diff /tmp/$file $file && {
+		echo "The same patch /tmp/$file already exists"
+		exit
+	}
+done
+
+git send-email	-q \
+		--confirm=never \
+		--no-signed-off-by-cc \
+		--no-chain-reply-to \
+		--to="Pengfei Xu <pengfei.xu@intel.com>" \
+		$files
+
+mv -f $files /tmp
