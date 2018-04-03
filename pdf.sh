@@ -6,6 +6,10 @@ file=""
 bak="bak"
 old=""
 num=""
+enscript=""
+
+enscript=$(dpkg -l | grep enscript)
+[[ -z "$enscript" ]] && sudo apt install -y enscript
 
 if [[ -z "$file_name" ]]; then
   [[ -e "$bak" ]] || mkdir "$bak"
