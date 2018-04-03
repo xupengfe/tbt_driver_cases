@@ -306,7 +306,7 @@ Command sample: "./runtests.sh -p cfl-h-rvp -P cfl-h-rvp -f ddt_intel/tbt_preboo
 Part 6 - TBT stress tests:
 6-1   TBT_XL_STRESS_COMMON_HOTPLUG tbt_func_test.sh -s poi -p 100
       Steps: Check tbt devices connected, and check tbt mode,
-             plug and unplug tbt devices, approve all tbt devices to access,
+             plug and unplug tbt devices 100 times, approve all tbt devices to access,
              all authorized should not 0, and topo is the same as last time.
 
 
@@ -359,10 +359,11 @@ Command sample: "./runtests.sh -p cfl-h-rvp -P cfl-h-rvp -f ddt_intel/tbt_suspen
 
 
 Part 8 - TBT user space tests:
-command sample:"./runtests.sh -p cfl-h-rvp -P cfl-h-rvp -f ddt_intel/tbt_userspace_tests -o /opt/logs/tbt_userspace -c"
+Command sample:"./runtests.sh -p cfl-h-rvp -P cfl-h-rvp -f ddt_intel/tbt_userspace_tests -o /opt/logs/tbt_userspace -c"
 8-1   TBT_XS_FUNC_ADM_TOPO tbt_tools.sh -s adm_topo
-      Steps: check tbt device connected, tried "tbtadm topology", executed return success,
-             should contain "Controller" "Security" "Route-string"
+      Steps: plug out tbt devices and then plug in tbt devices, check tbt
+             device connected, tried "tbtadm topology", executed return success,
+             result should contain "Controller" "Security" "Route-string"
 
 8-2   TBT_XS_FUNC_ADM_APPROVE_ALL tbt_tools.sh -s adm_approve_all
       Steps: check tbt device connected, tried "tbtadm approve-all", executed return
