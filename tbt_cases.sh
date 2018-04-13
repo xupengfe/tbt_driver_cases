@@ -13,6 +13,25 @@ Setup:
   The following test cases should be done in both ACPI enumeration (BIOS assisged) and
   native PCIe hotplug mode.
 
+Due to split none/user/secure/dp mode tests and common tests, use below command
+to execute tbt cases:
+
+-> In none/user/secure mode, please run the common cases which is not related with tbt mode:
+./runtests.sh -p cfl-h-rvp -P cfl-h-rvp -g tbt_common_subset -o /opt/logs/tbt -c
+
+-> For none/user/secure/dp mode:
+In none mode, please run:
+./runtests.sh -p cfl-h-rvp -P cfl-h-rvp -f ddt_intel/tbt_none_tests -o /opt/logs/tbt -c
+
+In user mode, please run:
+./runtests.sh -p cfl-h-rvp -P cfl-h-rvp -f ddt_intel/tbt_user_tests -o /opt/logs/tbt -c
+
+In secure mode, please run:
+./runtests.sh -pcfl-h-rvp -P cfl-h-rvp -f ddt_intel/tbt_secure_tests -o /opt/logs/tbt -c
+
+In dp mode, please run:
+./runtests.sh -p cfl-h-rvp -P cfl-h-rvp -f ddt_intel/tbt_dp_tests -o /opt/logs/tbt -c
+
 
 Part 1 - TBT BAT tests:
 Command sample: "./runtests.sh -p cfl-s_cnl-h -P cfl-s_cnl-h -f ddt_intel/tbt_bat_tests -o /opt/logs/tbt_bat -c"
