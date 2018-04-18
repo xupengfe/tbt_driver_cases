@@ -13,24 +13,30 @@ Setup:
   The following test cases should be done in both ACPI enumeration (BIOS assisged) and
   native PCIe hotplug mode.
 
-Due to split none/user/secure/dp mode tests and common tests, use below command
-to execute tbt cases:
 
--> In none/user/secure mode, please run the common cases which is not related with tbt mode:
+_________________________________________________________________________________________
+*****************************************************************************************
+Usage:
+Due to split none/user/secure/dp mode tests and common tests, use below commands
+to execute tbt cases:
+-> For common tests, run the common cases which is not related with tbt mode:
 ./runtests.sh -p cfl-h-rvp -P cfl-h-rvp -g tbt_common_subset -o /opt/logs/tbt -c
 
--> For none/user/secure/dp mode:
-In none mode, please run:
+-> For none/user/secure/dp mode tests:
+  In none mode, please run:
 ./runtests.sh -p cfl-h-rvp -P cfl-h-rvp -f ddt_intel/tbt_none_tests -o /opt/logs/tbt -c
 
-In user mode, please run:
+  In user mode, please run:
 ./runtests.sh -p cfl-h-rvp -P cfl-h-rvp -f ddt_intel/tbt_user_tests -o /opt/logs/tbt -c
 
-In secure mode, please run:
+  In secure mode, please run:
 ./runtests.sh -pcfl-h-rvp -P cfl-h-rvp -f ddt_intel/tbt_secure_tests -o /opt/logs/tbt -c
 
-In dp mode, please run:
+  In dp mode, please run:
 ./runtests.sh -p cfl-h-rvp -P cfl-h-rvp -f ddt_intel/tbt_dp_tests -o /opt/logs/tbt -c
+*****************************************************************************************
+_________________________________________________________________________________________
+
 
 
 Part 1 - TBT BAT tests:
@@ -126,143 +132,64 @@ Command sample: "./runtests.sh -p cfl-s_cnl-h -P cfl-s_cnl-h -f ddt_intel/tbt_ba
 
 Part 2 - TBT basic function tests:
 Command sample: "./runtests.sh -p cfl-s_cnl-h -P cfl-s_cnl-h -f ddt_intel/tbt_func_tests -o /opt/logs/tbt_func -c"
-2-1   TBT_XS_FUNC_NONE_MODE_TEST tbt_func_test.sh -s none
-      Steps: Security was set none, check tbt device connected,
-             all authorized should set 1.
-
-2-2   TBT_XS_FUNC_USER_MODE_TEST tbt_func_test.sh -s user
-      Steps: Security was set user, check tbt device connected,
-             set authorized to 1 successfully.
-
-2-3   TBT_XS_FUNC_SECURE_MODE_WRONG tbt_func_test.sh -s secure_wrong
-      Steps: Security was set secure, check tbt device connected,
-             set wrong key in sysfs key, and fill 2 to authorized try to approve,
-             which should be rejected due to wrong key, otherwise case will be failed.
-
-2-4   TBT_XS_FUNC_SECURE_MODE_VERIFY tbt_func_test.sh -s secure_verify
-      Steps: Security was set secure, check tbt device connected,
-             set new key in sysfs key, and fill 1 to authorized try to update key
-             and approve, which should return success.
-
-2-5   TBT_XS_FUNC_DPONLY_MODE_TEST tbt_func_test.sh -s dp
-      Steps: Security was set dponly, check tbt device connected,
-             set 1 to authorized file, and no usb and sata connected by tbt find.
-
-2-6   TBT_XS_FUNC_RW_TBT_SSD_10M tbt_ssd_read_write.sh -b 1MB -c 10 -p ssd -t 10
+2-1   TBT_XS_FUNC_RW_TBT_SSD_10M tbt_ssd_read_write.sh -b 1MB -c 10 -p ssd -t 10
       Steps: Except dponly mode, check tbt device connected,
              find ssd connected with tbt, transfer one 10M file into ssd by dd,
              transfer the 10M file in ssd to platform, and compare the 10M file
              should be same.
 
-2-7   TBT_XS_FUNC_RW_TBT_SSD_100M tbt_ssd_read_write.sh -b 1MB -c 100 -p ssd -t 10
+2-2   TBT_XS_FUNC_RW_TBT_SSD_100M tbt_ssd_read_write.sh -b 1MB -c 100 -p ssd -t 10
       Steps: Except dponly mode, check tbt device connected,
              find ssd connected with tbt, transfer one 100M file into ssd by dd,
              transfer the 100M file in ssd to platform, and compare the 100M file
              should be same.
 
-2-8   TBT_XS_FUNC_RW_TBT_SSD_500M tbt_ssd_read_write.sh -b 10MB -c 50 -p ssd -t 5
+2-3   TBT_XS_FUNC_RW_TBT_SSD_500M tbt_ssd_read_write.sh -b 10MB -c 50 -p ssd -t 5
       Steps: Except dponly mode, check tbt device connected,
              find ssd connected with tbt, transfer one 500M file into ssd by dd,
              transfer the 500M file in ssd to platform, and compare the 500M file
              should be same.
 
-2-9   TBT_XS_FUNC_RW_TBT_SSD_1000M tbt_ssd_read_write.sh -b 10MB -c 100 -p ssd -t 5
+2-4   TBT_XS_FUNC_RW_TBT_SSD_1000M tbt_ssd_read_write.sh -b 10MB -c 100 -p ssd -t 5
       Steps: Except dponly mode, check tbt device connected,
              find ssd connected with tbt, transfer one 1000M file into ssd by dd,
              transfer the 1000M file in ssd to platform, and compare the 1000M file
              should be same.
 
-2-10  TBT_XS_FUNC_RW_2.0_FLASH tbt_ssd_read_write.sh -b 1MB -c 100 -p 2.0 -d flash -t 2
+2-5  TBT_XS_FUNC_RW_2.0_FLASH tbt_ssd_read_write.sh -b 1MB -c 100 -p 2.0 -d flash -t 2
       Steps: Except dponly mode, check tbt device connected,
              find usb2.0 connected with tbt, transfer one 100M file into usb2.0 by dd,
              transfer the 100M file from usb2.0 to platform, and compare the 100M file
              should be same.
 
-2-11  TBT_XS_FUNC_RW_3.0_FLASH tbt_ssd_read_write.sh -b 1MB -c 100 -p 3.0 -d flash -t 2
+2-6  TBT_XS_FUNC_RW_3.0_FLASH tbt_ssd_read_write.sh -b 1MB -c 100 -p 3.0 -d flash -t 2
       Steps: Except dponly mode, check tbt device connected,
              find usb3.0 connected with tbt, transfer one 100M file into usb3.0 by dd,
              transfer the 100M file from usb3.0 to platform, and compare the 100M file
              should be same.
 
-2-12  TBT_XS_FUNC_MONITOR_NONE_TEST tbt_func_test.sh -s monitor_none
-      Steps: Find tbt 5K monitor in none mode, and check authorized should set 1.
-
-2-13  TBT_XS_FUNC_MONITOR_USER_TEST tbt_func_test.sh -s monitor_user
-      Steps: Find tbt 5K monitor in user mode, and set 1 in authorized, and return success.
-
-2-14  TBT_XS_FUNC_MONITOR_SECURE_TEST tbt_func_test.sh -s monitor_secure
-      Steps: Find tbt 5K monitor in secure mode, and verify corrected key, authorized
-             should set 2 when correct key is setted, set 1 when correct key is not
-             found and update new key.
-
-2-15  TBT_XS_FUNC_MONITOR_DP_TEST tbt_func_test.sh -s monitor_dp
-      Steps: Connect tbt 5K monitor, and approve 5K monitor accees,
-             check 5K monitor device is recognized.
-
 
 Part 3 - TBT hotplug function tests:
 Command sample: "./runtests.sh -p cfl-h-rvp -P cfl-h-rvp -f ddt_intel/tbt_hotplug_tests -o /opt/logs/tbt_hotplug -c"
-3-1   TBT_XS_FUNC_PLUG_OUT_TEST tbt_func_test.sh -s po
-      Steps: Check tbt devices connected, then plug out all tbt devices,
-             30s later, check no tbt router like 0-1 folder exist in sysfs.
-
-3-2   TBT_XS_FUNC_USER_PLUG_IN_CHECK tbt_func_test.sh -s upic
-      Steps: In user mode, check tbt devices connected, check all tbt router folders exist
-             in sysfs files /sys/bus/thunderbolt/devices, all tbt router authorized should
-             set 0.
-
-3-3   TBT_XS_FUNC_USER_PLUG_IN_ERROR_CHECK tbt_func_test.sh -s upie
-      Steps: In user mode, check tbt devices connected, fill in invalid string in
-             authorized, all these action should reject.
-
-3-4   TBT_XS_FUNC_USER_PLUG_IN_ACC_CHECK tbt_func_test.sh -s upiac
-      Steps: In user mode, check tbt devices connected, set 1 to authorized, should return
-             success, check lspci should contain thunderbolt.
-
-3-5   TBT_XS_FUNC_USER_PLUG_IN_ACC_ERROR tbt_func_test.sh -s upiae
-      Steps: In user mode, check tbt devices connected, all tbt router authorized set 1,
-             fill in invalid string in authorized, should reject.
-
-3-6   TBT_XS_FUNC_SECURE_PLUG_IN_CHECK tbt_func_test.sh -s spic
-      Steps: In secure mode, plug in all tbt devices, tbt router authorized should set 0.
-
-3-7   TBT_XS_FUNC_SECURE_PLUG_IN_ERROR_CHECK tbt_func_test.sh -s spie
-      Steps: In secure mode, plug in all tbt devices, input invalid string in authorized,
-             all these actions return fail.
-
-3-8   TBT_XS_FUNC_SECURE_PLUG_IN_APPROVE tbt_func_test.sh -s spiaw
-      Steps: In secure mode, check tbt devices connected, set 1 into authorized without
-             key, return success, and all tbt devices approve to access.
-
-3-9   TBT_XS_FUNC_SECURE_PLUG_IN_UPDATE_KEY tbt_func_test.sh -s spiu
-      Steps: In secure mode, plug out all tbt devices, and plug in, set the new key in
-             sysfs key, then set 1 into authorized, should return success, and all tbt
-             approve to access, and update the new key successfully.
-
-3-10  TBT_XS_FUNC_SECURE_PLUG_IN_VERIFY_KEY tbt_func_test.sh -s spiv
-      Steps: In secure mode, plug out all tbt devices, and plug in, set the key last
-             time update, set 2 into authorized, should return success, all tbt appove
-             to access.
-
-3-11  TBT_XS_FUNC_COMMON_SSD_TRANS_POI tbt_func_test.sh -s po_transfer -p ssd -d device
+3-1   TBT_XS_FUNC_COMMON_SSD_TRANS_POI tbt_func_test.sh -s po_transfer -p ssd -d device
       Steps: Except dp mode, plug in tbt devices which connected ssd, appove tbt access,
              transfer 500M file into ssd, when transfer file is ongoing, plug out all
              tbt devices, 30s later plug in tbt devices should without issue, and transfer
              500M file in ssd successfully.
 
-3-12  TBT_XS_FUNC_COMMON_USB2.0_TRANS_POI tbt_func_test.sh -s po_transfer -p 2.0 -d flash
+3-2   TBT_XS_FUNC_COMMON_USB2.0_TRANS_POI tbt_func_test.sh -s po_transfer -p 2.0 -d flash
       Steps: Except dp mode, plug in tbt devices which connected usb2.0, appove tbt access,
              transfer 500M file into usb2.0, when transfer file is ongoing, plug out all
              tbt devices, 30s later plug in tbt devices should without issue, and transfer
              500M file in 2.0 successfully.
 
-3-13  TBT_XS_FUNC_COMMON_USB3.0_TRANS_POI tbt_func_test.sh -s po_transfer -p 3.0 -d flash
+3-3   TBT_XS_FUNC_COMMON_USB3.0_TRANS_POI tbt_func_test.sh -s po_transfer -p 3.0 -d flash
       Steps: Except dp mode, plug in tbt devices which connected usb3.0, appove tbt access,
              transfer 500M file into usb3.0, when transfer file is ongoing, plug out all
              tbt devices, 30s later plug in tbt devices should without issue, and transfer
              500M file in 3.0 successfully.
 
-3-14  TBT_XS_FUNC_COMMON_HOTPLUG_CHECK tbt_func_test.sh -s poi -p 10
+3-4   TBT_XS_FUNC_COMMON_HOTPLUG_CHECK tbt_func_test.sh -s poi -p 10
       Steps: In none mode, plug/unplug test 10 times, after unplug, authorized should
              set 1.
              In user mode, plug/unplug test 10 times, after unplug, authorized should
@@ -403,3 +330,101 @@ Command sample:"./runtests.sh -p cfl-h-rvp -P cfl-h-rvp -f ddt_intel/tbt_userspa
 8-6   TBT_XS_FUNC_ADM_RM_ALL tbt_tools.sh -s adm_remove_all
       Steps: check tbt device connected, "tbtadm remove-all", executed return success,
              no any file in /var/lib/thunderbolt.
+
+
+Part 9 - TBT none mode tests:
+Command sample:"./runtests.sh -p cfl-s_cnl-h -P cfl-s_cnl-h -f ddt_intel/tbt_none_tests -o /opt/logs/tbt -c"
+9-1   TBT_XS_FUNC_NONE_MODE_TEST tbt_func_test.sh -s none
+      Steps: Security was set none, check tbt device connected,
+             all authorized should set 1.
+
+9-2   TBT_XS_FUNC_MONITOR_NONE_TEST tbt_func_test.sh -s monitor_none
+      Steps: Find tbt 5K monitor in none mode, and check authorized should set 1.
+
+
+Part 10 - TBT user mode tests:
+Command sample:"./runtests.sh -p cfl-s_cnl-h -P cfl-s_cnl-h -f ddt_intel/tbt_user_tests -o /opt/logs/tbt -c"
+10-1  TBT_XS_FUNC_USER_MODE_TEST tbt_func_test.sh -s user
+      Steps: Security was set user, check tbt device connected,
+             set authorized to 1 successfully.
+
+10-2  TBT_XS_FUNC_MONITOR_USER_TEST tbt_func_test.sh -s monitor_user
+      Steps: Find tbt 5K monitor in user mode, and set 1 in authorized, and return success.
+
+10-3  TBT_XS_FUNC_USER_PLUG_OUT_TEST tbt_func_test.sh -s po
+      Steps: Check tbt devices connected and set user mode, then plug out all tbt devices,
+             30s later, check no tbt router like 0-1 folder exist in sysfs.
+
+10-4  TBT_XS_FUNC_USER_PLUG_IN_CHECK tbt_func_test.sh -s upic
+      Steps: In user mode, check tbt devices connected, check all tbt router folders exist
+             in sysfs files /sys/bus/thunderbolt/devices, all tbt router authorized should
+             set 0.
+
+10-5  TBT_XS_FUNC_USER_PLUG_IN_ERROR_CHECK tbt_func_test.sh -s upie
+      Steps: In user mode, check tbt devices connected, fill in invalid string in
+             authorized, all these action should reject.
+
+10-6  TBT_XS_FUNC_USER_PLUG_IN_ACC_CHECK tbt_func_test.sh -s upiac
+      Steps: In user mode, check tbt devices connected, set 1 to authorized, should return
+             success, check lspci should contain thunderbolt.
+
+10-7  TBT_XS_FUNC_USER_PLUG_IN_ACC_ERROR tbt_func_test.sh -s upiae
+      Steps: In user mode, check tbt devices connected, all tbt router authorized set 1,
+             fill in invalid string in authorized, should reject.
+
+
+Part 11 - TBT secure mode tests:
+Command sample:"./runtests.sh -p cfl-s_cnl-h -P cfl-s_cnl-h -f ddt_intel/tbt_secure_tests -o /opt/logs/tbt -c"
+11-1  TBT_XS_FUNC_SECURE_MODE_WRONG tbt_func_test.sh -s secure_wrong
+      Steps: Security was set secure, check tbt device connected,
+             set wrong key in sysfs key, and fill 2 to authorized try to approve,
+             which should be rejected due to wrong key, otherwise case will be failed.
+
+11-2  TBT_XS_FUNC_SECURE_MODE_VERIFY tbt_func_test.sh -s secure_verify
+      Steps: Security was set secure, check tbt device connected,
+             set new key in sysfs key, and fill 1 to authorized try to update key
+             and approve, which should return success.
+
+11-3  TBT_XS_FUNC_MONITOR_SECURE_TEST tbt_func_test.sh -s monitor_secure
+      Steps: Find tbt 5K monitor in secure mode, and verify corrected key, authorized
+             should set 2 when correct key is setted, set 1 when correct key is not
+             found and update new key.
+
+11-4  TBT_XS_FUNC_SECURE_PLUG_OUT_TEST tbt_func_test.sh -s po
+      Steps: Check tbt connected and in secure mode, then plug out all tbt devices,
+             30s later, check no tbt router like 0-1 folder exist in sysfs.
+
+11-5  TBT_XS_FUNC_SECURE_PLUG_IN_CHECK tbt_func_test.sh -s spic
+      Steps: In secure mode, plug in all tbt devices, tbt router authorized should set 0.
+
+11-6  TBT_XS_FUNC_SECURE_PLUG_IN_ERROR_CHECK tbt_func_test.sh -s spie
+      Steps: In secure mode, plug in all tbt devices, input invalid string in authorized,
+             all these actions return fail.
+
+11-7  TBT_XS_FUNC_SECURE_PLUG_IN_APPROVE tbt_func_test.sh -s spiaw
+      Steps: In secure mode, check tbt devices connected, set 1 into authorized without
+             key, return success, and all tbt devices approve to access.
+
+11-8  TBT_XS_FUNC_SECURE_PLUG_IN_UPDATE_KEY tbt_func_test.sh -s spiu
+      Steps: In secure mode, plug out all tbt devices, and plug in, set the new key in
+             sysfs key, then set 1 into authorized, should return success, and all tbt
+             approve to access, and update the new key successfully.
+
+11-9  TBT_XS_FUNC_SECURE_PLUG_IN_VERIFY_KEY tbt_func_test.sh -s spiv
+      Steps: In secure mode, plug out all tbt devices, and plug in, set the key last
+             time update, set 2 into authorized, should return success, all tbt appove
+             to access.
+
+Part 12 - TBT dp only mode tests:
+Command sample:"./runtests.sh -p cfl-s_cnl-h -P cfl-s_cnl-h -f ddt_intel/tbt_dp_tests -o /opt/logs/tbt -c"
+12-1  TBT_XS_FUNC_DPONLY_MODE_TEST tbt_func_test.sh -s dp
+      Steps: Security was set dponly, check tbt device connected,
+             set 1 to authorized file, and no usb and sata connected by tbt find.
+
+12-2  TBT_XS_FUNC_MONITOR_DP_TEST tbt_func_test.sh -s monitor_dp
+      Steps: Connect tbt 5K monitor, and approve 5K monitor accees,
+             check 5K monitor device is recognized.
+
+Part 13 - TBT usb only mode tests:
+Command sample: reserved
+Cases: reserved
