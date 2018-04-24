@@ -173,21 +173,21 @@ Part 3 - TBT hotplug function tests:
 Command sample: "./runtests.sh -p cfl-h-rvp -P cfl-h-rvp -f ddt_intel/tbt_hotplug_tests -o /opt/logs/tbt_hotplug -c"
 3-1   TBT_XS_FUNC_COMMON_SSD_TRANS_POI tbt_func_test.sh -s po_transfer -p ssd -d device
       Steps: Except dp mode, plug in tbt devices which connected ssd, appove tbt access,
-             transfer 500M file into ssd, when transfer file is ongoing, plug out all
+             transfer 600M file into ssd, when transfer file is ongoing, plug out all
              tbt devices, 30s later plug in tbt devices should without issue, and transfer
-             500M file in ssd successfully.
+             600M file in ssd successfully.
 
 3-2   TBT_XS_FUNC_COMMON_USB2.0_TRANS_POI tbt_func_test.sh -s po_transfer -p 2.0 -d flash
       Steps: Except dp mode, plug in tbt devices which connected usb2.0, appove tbt access,
-             transfer 500M file into usb2.0, when transfer file is ongoing, plug out all
+             transfer 600M file into usb2.0, when transfer file is ongoing, plug out all
              tbt devices, 30s later plug in tbt devices should without issue, and transfer
-             500M file in 2.0 successfully.
+             600M file in 2.0 successfully.
 
 3-3   TBT_XS_FUNC_COMMON_USB3.0_TRANS_POI tbt_func_test.sh -s po_transfer -p 3.0 -d flash
       Steps: Except dp mode, plug in tbt devices which connected usb3.0, appove tbt access,
-             transfer 500M file into usb3.0, when transfer file is ongoing, plug out all
+             transfer 600M file into usb3.0, when transfer file is ongoing, plug out all
              tbt devices, 30s later plug in tbt devices should without issue, and transfer
-             500M file in 3.0 successfully.
+             600M file in 3.0 successfully.
 
 3-4   TBT_XS_FUNC_COMMON_HOTPLUG_CHECK tbt_func_test.sh -s poi -p 10
       Steps: In none mode, plug/unplug test 10 times, after unplug, authorized should
