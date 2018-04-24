@@ -428,3 +428,15 @@ Command sample:"./runtests.sh -p cfl-s_cnl-h -P cfl-s_cnl-h -f ddt_intel/tbt_dp_
 Part 13 - TBT usb only mode tests:
 Command sample: reserved
 Cases: reserved
+Plan 4 cases to check: usb detected automatically, usb2.0/3.0 transfer ok,
+sata interface should not be detected.
+
+
+Part 14 - TBT RTD3 tests:
+Command sample: reserved
+Cases: reserved
+Check host controller set runtime PM auto, check set to auto, and all xhci auto
+successfully, and host controller goes to D3 soon, set on to runtime PM, host
+controller goese to D0 and stays there. Check sleep test cases. Check transfer
+cases which should impacted RTD3 status.
+Due to lack of 1st and 2nd generation tbt devices, plan to add 8 cases.
