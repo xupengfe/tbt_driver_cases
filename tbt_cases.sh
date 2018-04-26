@@ -205,18 +205,34 @@ Part 4 - TBT NVM downgrade upgrade tests:
 Command sample: "./runtests.sh -p cfl-h-rvp -P cfl-h-rvp -f ddt_intel/tbt_nvm_tests -o /opt/logs/tbt_nvm -c"
 4-1   TBT_XS_FUNC_NVM_DOWNGRADE tbt_func_test.sh -s nvm_downgrade
       Steps: Save the nvm version before downgrade, copy nvm downgrade file in
-             /sys/bus/thunderbolt/devices/0-0/nvm_authenticate, set 1 into
+             /sys/bus/thunderbolt/devices/0-0/nvm_non_active0/nvmem, set 1 into
              /sys/bus/thunderbolt/devices/0-0/nvm_authenticate to start NVM
-             downgrade, after nvm_authenticate changed to 0, check nvm version
-             is expected and different than before NVM.
+             downgrade, after nvm_authenticate changed to 0, otherwise will
+             fail the case, check nvm version is expected.
 
 4-2   TBT_XS_FUNC_NVM_UPGRADE tbt_func_test.sh -s nvm_upgrade
       Steps: Save the nvm version before upgrade, copy nvm upgrade file in
-             /sys/bus/thunderbolt/devices/0-0/nvm_authenticate, set 1 into
+             /sys/bus/thunderbolt/devices/0-0/nvm_non_active0/nvmem, set 1 into
              /sys/bus/thunderbolt/devices/0-0/nvm_authenticate to start NVM
-             upgrade, after nvm_authenticate changed to 0, check nvm version
-             is expected.
+             upgrade, after nvm_authenticate changed to 0, otherwise will
+             fail the case, check nvm version is expected.
 
+4-3   TBT_XS_FUNC_EP_DOWNGRADE tbt_func_test.sh -s ep_downgrade
+      Steps: Found tbt EP device, if no will fail the case. Save the nvm
+             version before downgrade, copy nvm downgrade file for EP in
+             /sys/bus/thunderbolt/devices/0-X/nvm_non_activeX/nvmem, set 1 into
+             /sys/bus/thunderbolt/devices/0-X/nvm_authenticate to start NVM
+             EP downgrade, after nvm_authenticate changed to 0, otherwise will
+             fail the case, check nvm version is expected.
+
+4-4   TBT_XS_FUNC_EP_UPGRADE tbt_func_test.sh -s ep_upgrade
+      Steps: Found tbt EP device, if no will fail the case. Save the nvm
+             version before upgrade, copy nvm upgrade file for EP in
+             /sys/bus/thunderbolt/devices/0-X/nvm_non_activeX/nvmem, set 1 into
+             /sys/bus/thunderbolt/devices/0-X/nvm_authenticate to start NVM
+             EP upgrade, after nvm_authenticate changed to 0, otherwise
+             fail the case, check nvm version should the same as before nvm
+             test, if no will print the warning.
 
 Part 5 - TBT Preboot ACL tests:
 Command sample: "./runtests.sh -p cfl-h-rvp -P cfl-h-rvp -f ddt_intel/tbt_preboot_tests -o /opt/logs/tbt_preboot -c"
@@ -437,6 +453,6 @@ Command sample: reserved
 Cases: reserved
 Check host controller set runtime PM auto, check set to auto, and all xhci auto
 successfully, and host controller goes to D3 soon, set on to runtime PM, host
-controller goese to D0 and stays there. Check sleep test cases. Check transfer
+controller goes to D0 and stays there. Check sleep test cases. Check transfer
 cases which should impacted RTD3 status.
 Due to lack of 1st and 2nd generation tbt devices, plan to add 8 cases.
