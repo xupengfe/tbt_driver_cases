@@ -449,10 +449,40 @@ sata interface should not be detected.
 
 
 Part 14 - TBT RTD3 tests:
-Command sample: reserved
-Cases: reserved
-Check host controller set runtime PM auto, check set to auto, and all xhci auto
-successfully, and host controller goes to D3 soon, set on to runtime PM, host
-controller goes to D0 and stays there. Check sleep test cases. Check transfer
-cases which should impacted RTD3 status.
-Due to lack of 1st and 2nd generation tbt devices, plan to add 8 cases.
+Command sample:"./runtests.sh -p cfl-h-rvp -P cfl-h-rvp -f ddt_intel/tbt_rtd3_tests -o /opt/logs/tbt -c"
+14-1  TBT_XS_FUNC_RTD3_CHECK
+      Steps: check after connected tbt devices, /sys/bus/thunderbolt/devices/0-0/power/control should
+             set auto. If not, will fail the case.
+
+14-2  TBT_XS_FUNC_RTD3_SET_AUTO
+      Steps: Set all xhci and ahci in tbt pci bus power/control with auto.
+             for example: "echo auto > /sys/bus/pci/devices/0000:37:00.0/power/control", all should
+             return success.
+
+14-3  TBT_XS_FUNC_RTD3_PLUG_XHCI_CHECK
+      Steps: Plug out all tbt devices, host router should contain xhci, if not, will block this test.
+             If it contain xhci, will set xhci power/control to auto, and check 8s later in D3.
+
+14-4  TBT_XS_FUNC_RTD3_PLUG_HOST_CHECK
+      Steps: Plug out all tbt devices, host router should set auto, find 0-0 PCI bus is in D0 state,
+             and check 0-0 PCI bus should in D3 8s idle later.
+
+14-5  TBT_XS_FUNC_RTD3_HOST_BUSY_CHECK
+      Steps: Plug out all tbt devices, host 0-0 in D3, and then execute action let 0-0 busy,
+             like: "cat /sys/bus/thunderbolt/devices/domain0/boot_acl",
+             check 0-0 PCI bus is in D0 state.
+
+14-6  TBT_XS_FUNC_RTD3_HOST_IDLE_CHECK
+      Steps: Plug out all tbt devices, let host 0-0 in idle 8s, and check host PCI in D3.
+
+14-7  TBT_XS_FUNC_RTD3_HOST_UNLOAD_DRIVER
+      Steps: Plug out all tbt devices, let host 0-0 in idle 8s, unload thunderbolt driver,
+             check host PCI should be in D0.
+
+14-8  TBT_XS_FUNC_RTD3_HOST_LOAD_DRIVER
+      Steps: Plug out all tbt devices, load thunderbolt driver, and then let host idle 8s,
+             check host PCI should be in D3.
+
+14-9  TBT_XS_FUNC_RTD3_UNPLUG_HOST_CHECK
+      Steps: Plug in thunderbolt devices, check host PCI in D0 status, due to xhci and
+             ahci is on not auto mode.
