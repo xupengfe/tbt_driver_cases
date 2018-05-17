@@ -450,39 +450,56 @@ sata interface should not be detected.
 
 Part 14 - TBT RTD3 tests:
 Command sample:"./runtests.sh -p cfl-h-rvp -P cfl-h-rvp -f ddt_intel/tbt_rtd3_tests -o /opt/logs/tbt -c"
-14-1  TBT_XS_FUNC_RTD3_CHECK
-      Steps: check after connected tbt devices, /sys/bus/thunderbolt/devices/0-0/power/control should
-             set auto. If not, will fail the case.
+14-1  TBT_XS_FUNC_RTD3_INIT
+      Steps: check after disconnected tbt, /sys/bus/thunderbolt/devices/0-0/power/control
+             should set auto. If not, will fail the case.
 
-14-2  TBT_XS_FUNC_RTD3_SET_AUTO
-      Steps: Set all xhci and ahci in tbt pci bus power/control with auto.
-             for example: "echo auto > /sys/bus/pci/devices/0000:37:00.0/power/control", all should
-             return success.
+14-2  TBT_XS_FUNC_RTD3_HOST_D3
+      Steps: check after disconnected tbt, /sys/bus/thunderbolt/devices/0-0/power/control
+             should set auto. After 8s idle, host controller bus should be in D3
 
-14-3  TBT_XS_FUNC_RTD3_PLUG_XHCI_CHECK
-      Steps: Plug out all tbt devices, host router should contain xhci, if not, will block this test.
-             If it contain xhci, will set xhci power/control to auto, and check 8s later in D3.
+14-3  TBT_XS_FUNC_RTD3_HOST_BUSY
+      Steps: check after disconnected tbt, /sys/bus/thunderbolt/devices/0-0/power/control
+             should set auto, check host preboot acl, and tbt host bus should be in D0,
+             after idle 8s tbt host bus should be in D3 again
 
-14-4  TBT_XS_FUNC_RTD3_PLUG_HOST_CHECK
-      Steps: Plug out all tbt devices, host router should set auto, find 0-0 PCI bus is in D0 state,
-             and check 0-0 PCI bus should in D3 8s idle later.
+14-4  TBT_XS_FUNC_RTD3_HOST_ON_CHECK
+      Steps: check after disconnected tbt, /sys/bus/thunderbolt/devices/0-0/power/control
+             set to on successfully, and idle 8s, host bus should be in D0.
+             set 0-0/power/control to auto back, idle 8s, host bus should be in D3.
 
-14-5  TBT_XS_FUNC_RTD3_HOST_BUSY_CHECK
-      Steps: Plug out all tbt devices, host 0-0 in D3, and then execute action let 0-0 busy,
-             like: "cat /sys/bus/thunderbolt/devices/domain0/boot_acl",
-             check 0-0 PCI bus is in D0 state.
+14-5  TBT_XS_FUNC_RTD3_HOST_XHCI_CHECK
+      Steps: Plug out all tbt devices, host router should contain xhci, if not,
+             will block this test. If it contain xhci, will set xhci power/control to auto,
+             and check 8s later in D3.
 
-14-6  TBT_XS_FUNC_RTD3_HOST_IDLE_CHECK
-      Steps: Plug out all tbt devices, let host 0-0 in idle 8s, and check host PCI in D3.
-
-14-7  TBT_XS_FUNC_RTD3_HOST_UNLOAD_DRIVER
+14-6  TBT_XS_FUNC_RTD3_HOST_UNLOAD_DRIVER
       Steps: Plug out all tbt devices, let host 0-0 in idle 8s, unload thunderbolt driver,
              check host PCI should be in D0.
 
-14-8  TBT_XS_FUNC_RTD3_HOST_LOAD_DRIVER
-      Steps: Plug out all tbt devices, load thunderbolt driver, and then let host idle 8s,
-             check host PCI should be in D3.
+14-7  TBT_XS_FUNC_RTD3_HOST_LOAD_DRIVER
+      Steps: Plug out all tbt devices, load thunderbolt driver,at first host in D0,
+             and then let host idle 8s, check host PCI should be in D3.
 
-14-9  TBT_XS_FUNC_RTD3_UNPLUG_HOST_CHECK
+14-8  TBT_XS_FUNC_RTD3_freeze_test
+      Steps: Check host controller was in D3 mode, and then freeze sleep, after wake up
+             and wait 8s, controller should in D3 again.
+
+14-9  TBT_XS_FUNC_RTD3_S3_test
+      Steps: Check host controller was in D3 mode, and then S3 sleep, after wake up
+             and wait 8s, host controller should in D3 again.
+
+14-10 TBT_XS_FUNC_RTD3_PLUGIN_HOST_CHECK
       Steps: Plug in thunderbolt devices, check host PCI in D0 status, due to xhci and
              ahci is on not auto mode.
+
+14-11 TBT_XS_FUNC_RTD3_PLUGIN_XHCI
+      Steps: Set all xhci and ahci in tbt pci bus power/control with auto.
+             for example: "echo auto > /sys/bus/pci/devices/0000:37:00.0/power/control",
+             all should return success. And after idle 8s, xhci should be in D3
+
+14-12 TBT_XS_FUNC_RTD3_PLUGIN_AHCI
+      Steps: Set all ahci in tbt pci bus power/control with auto. Check AHCI should be
+             in D3 after 30s idle.
+             Then transfer file in ahci device connected by tbt, ahci should in D0.
+             After 30s later should be back in D3 too.
