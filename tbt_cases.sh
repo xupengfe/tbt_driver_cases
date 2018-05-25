@@ -319,6 +319,18 @@ Command sample: "./runtests.sh -p cfl-h-rvp -P cfl-h-rvp -f ddt_intel/tbt_suspen
              and set deep and execute mem sleep, after wake up, check tbt monitor
              sysfs file should come back, and check monitor sysfile content as expected.
 
+7-10  TBT_XS_FUNC_S4_TBT_TEST tbt_func_test.sh -s suspend -t disk -p tbt
+      Steps: Connect thunderbolt deivces and test s4, rtcwake -m disk -s 40,
+             check TBT connection after s4 sleep.
+
+7-11  TBT_XS_FUNC_S4_SSD_RW tbt_func_test.sh -s suspend -t disk -p ssd
+      Steps: Connect thunderbolt deivces and test s4, rtcwake -m disk -s 40,
+             check TBT SSD read write function
+
+7-12  TBT_XS_FUNC_S4_MONITOR_TEST tbt_func_test.sh -s suspend -t disk -p monitor
+      Steps: Connect thunderbolt deivces and test s4, rtcwake -m disk -s 40,
+             check TBT monitor 5K works well or not
+
 
 Part 8 - TBT user space tests:
 Command sample:"./runtests.sh -p cfl-h-rvp -P cfl-h-rvp -f ddt_intel/tbt_userspace_tests -o /opt/logs/tbt_userspace -c"
@@ -503,3 +515,6 @@ Command sample:"./runtests.sh -p cfl-h-rvp -P cfl-h-rvp -f ddt_intel/tbt_rtd3_te
              in D3 after 30s idle.
              Then transfer file in ahci device connected by tbt, ahci should in D0.
              After 30s later should be back in D3 too.
+14-13 TBT_XS_FUNC_RTD3_S4_test
+      Steps: Check host controller was in D3 mode, and then s4 sleep,
+             after wake up and wait 8s, Controller should in D3 again.
