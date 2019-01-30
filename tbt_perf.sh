@@ -2,7 +2,7 @@
 
 log_path=$1
 
-date_file=="perf_date.txt"
+date_file="perf_date.txt"
 bak_file="perf_date.txt_bak"
 [[ -e "$date_file" ]] && mv $date_file $bak_file
 date
