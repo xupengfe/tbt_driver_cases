@@ -109,8 +109,8 @@ verify_perf_result() {
   rnb_total=$(printf "%.3f" $(echo "scale=3;$rnb_total/$num" | bc))
   rnbs_total=$(printf "%.3f" $(echo "scale=3;$rnbs_total/$num" | bc))
 
-  rb_gap=$(printf "%.3f" $(echo "scale=3;$rb_total - $rnbs_total" | bc))
-  rb_gap_rate=$(printf "%.4f" $(echo "scale=4;$rb_gap/$rnbs_total" | bc))
+  rb_gap=$(printf "%.3f" $(echo "scale=3;$rb_total - $rnb_total" | bc))
+  rb_gap_rate=$(printf "%.4f" $(echo "scale=4;$rb_gap/$rnb_total" | bc))
 
   rnb_gap=$(printf "%.3f" $(echo "scale=3;$rnbs_total - $rnb_total" | bc))
   rnb_gap_rate=$(printf "%.4f" $(echo "scale=4;$rnb_gap/$rnb_total" | bc))
@@ -118,15 +118,15 @@ verify_perf_result() {
   echo "$tp read nobounce        average MB/s:$rnb_total" >> $read_file
   echo "$tp read nobounce strict average MB/s:$rnbs_total" >> $read_file
   echo "$tp read bounce          average MB/s:$rb_total" >> $read_file
-  echo "$tp read nobounce with strict gap rate: $rnb_gap_rate" >> $read_file
-  echo "$tp read nobounce strict and bounce gap:$rb_gap_rate" >> $read_file
+  echo "$tp read nobounce and nobounce strict gap rate: $rnb_gap_rate" >> $read_file
+  echo "$tp read nobounce and bounce gap rate:$rb_gap_rate" >> $read_file
 
   wb_total=$(printf "%.3f" $(echo "scale=3;$wb_total/$num" | bc))
   wnb_total=$(printf "%.3f" $(echo "scale=3;$wnb_total/$num" | bc))
   wnbs_total=$(printf "%.3f" $(echo "scale=3;$wnbs_total/$num" | bc))
 
-  wb_gap=$(printf "%.3f" $(echo "scale=3;$wb_total - $wnbs_total" | bc))
-  wb_gap_rate=$(printf "%.4f" $(echo "scale=4;$wb_gap/$wnbs_total" | bc))
+  wb_gap=$(printf "%.3f" $(echo "scale=3;$wb_total - $wnb_total" | bc))
+  wb_gap_rate=$(printf "%.4f" $(echo "scale=4;$wb_gap/$wnb_total" | bc))
 
   wnb_gap=$(printf "%.3f" $(echo "scale=3;$wnbs_total - $wnb_total" | bc))
   wnb_gap_rate=$(printf "%.4f" $(echo "scale=4;$wnb_gap/$wnb_total" | bc))
@@ -134,8 +134,8 @@ verify_perf_result() {
   echo "$tp write nobounce        average MB/s:$wnb_total" >> $write_file
   echo "$tp write nobounce strict average MB/s:$wnbs_total" >> $write_file
   echo "$tp write bounce          average MB/s:$wb_total" >> $write_file
-  echo "$tp write nobounce with strict gap rate: $wnb_gap_rate" >> $write_file
-  echo "$tp write nobounce strict and bounce gap:$wb_gap_rate" >> $write_file
+  echo "$tp write nobounce and nobounce strict gap rate: $wnb_gap_rate" >> $write_file
+  echo "$tp write nobounce and bounce gap:$wb_gap_rate" >> $write_file
 
   cat $read_file
   cat $write_file
