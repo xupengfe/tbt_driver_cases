@@ -141,20 +141,20 @@ verify_perf_result() {
   cat $write_file
 
   result=$(echo "$rnb_gap_rate <= 0 " | bc)
-  [[ "$result" -eq 1 ]] || die "rnb_gap_rate greater than 0:$rnb_gap_rate"
+  [[ "$result" -eq 1 ]] || echo "rnb_gap_rate greater than 0:$rnb_gap_rate"
 
   result=$(echo "$rb_gap_rate <= 0 " | bc)
-   [[ "$result" -eq 1 ]] || die "rb_gap_rate greater than 0:$rb_gap_rate"
+   [[ "$result" -eq 1 ]] || echo "rb_gap_rate greater than 0:$rb_gap_rate"
 
   result=$(echo "$wnb_gap_rate <= 0 " | bc)
-  [[ "$result" -eq 1 ]] || die "wnb_gap_rate greater than 0:$wnb_gap_rate"
+  [[ "$result" -eq 1 ]] || echo "wnb_gap_rate greater than 0:$wnb_gap_rate"
 
   result=$(echo "$wb_gap_rate <= 0 " | bc)
-  [[ "$result" -eq 1 ]] || die "wb_gap_rate greater than 0:$wb_gap_rate"
+  [[ "$result" -eq 1 ]] || echo "wb_gap_rate greater than 0:$wb_gap_rate"
 }
 
 main() {
-  local tps=("2.0" "3.0" "ssd")
+  local tps="2.0 3.0 ssd"
   local tp=""
   local nb=""
   local nbs=""
