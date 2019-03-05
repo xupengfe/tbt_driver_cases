@@ -26,8 +26,19 @@
 #include <stdio.h>
 #include "USBaccess.h"
 
+void usage(void) {
+	printf("cleware Usage: [0 | 1]\n");
+	printf("0: power off\n");
+	printf("1: power on\n");
+}
+
 int main(int argc, char* argv[]) {
 	CUSBaccess CWusb;
+
+	if(argc == 1) {
+		usage();
+		return 2;
+	}
 
 	printf("Start USB Access Beispiel!\n");
 	printf("argc=%d,argv[1][0]=%c\n",argc,argv[1][0]);
