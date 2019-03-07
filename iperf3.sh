@@ -1,6 +1,8 @@
 #!/bin/bash
 
 ip=$1
+ip_host="192.168.1.10"
+local_guest_default="192.168.1.11"
 
 tbt_net="tbt_net.txt"
 tbt_net_last="tbt_net_last.txt"
@@ -8,9 +10,13 @@ tbt_net_last="tbt_net_last.txt"
 [[ -e "$tbt_net" ]] && mv $tbt_net $tbt_net_last
 
 [[ -n "$ip" ]] || {
-	echo "Didn't set host ip, set host ip 192.168.1.11 by default"
-	echo "Didn't set host ip, set host ip 192.168.1.11 by default" >  $tbt_net
-	ip="192.168.1.11"
+	echo "Didn't set host ip, need set local guest ip $local_guest_default by default"
+	echo "Didn't set host ip, need set local guest ip $local_guest_default by default" > $tbt_net
+	echo "Host ip should be $ip_host"
+	ifconfig thunderbolt0 $local_guest_default
+	echo "ifconfig thunderbolt0 $local_guest_default"
+	echo "ifconfig thunderbolt0 $local_guest_default" >> $tbt_net
+	ip=$ip_host
 	}
 
 echo "Linux kernel $(uname -r)" >> $tbt_net
