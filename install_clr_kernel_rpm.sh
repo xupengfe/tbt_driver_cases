@@ -25,5 +25,5 @@ system=$(ls ${home}/boot/System*)
 config=$(ls ${home}/boot/config*)
 echo "installkernel $module $vmlinuz $system /boot"
 installkernel $module $vmlinuz $system /boot
-echo "cp ${home}/boot/$config /lib/kernel/"
-cp ${home}/boot/$config /lib/kernel/
+echo "cp $config /lib/kernel/"
+cp $config /lib/kernel/
