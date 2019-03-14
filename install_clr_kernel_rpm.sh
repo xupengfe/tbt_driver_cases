@@ -28,9 +28,11 @@ installkernel $module $vmlinuz $system /boot
 echo "cp $config /lib/kernel/"
 cp $config /lib/kernel/
 
-echo "mount /dev/sda1 /mnt"
-mount /dev/sda1 /mnt
+node=$(fdisk -l  | grep EFI | tail -n 1 | cut -d ' ' -f 1)
 loader="/mnt/loader/loader.conf"
+
+echo "mount $node /mnt"
+mount $node /mnt
 [[ -e "$loader" ]] || {
 	echo "no $loader file"
 	return 1
