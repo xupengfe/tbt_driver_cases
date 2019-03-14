@@ -1,13 +1,30 @@
 #!/bin/bash
 
+rpm_name=$1
 home=$(pwd)
-build=$(ls -1 kernel-*rpm | head -n 1)
+
+
+if [[ -n "$rpm_name" ]]; then
+	build=$rpm_name
+else
+	build=$(ls -1 kernel-*rpm | head -n 1)
+fi
+
 [[ -n "$build" ]] || {
-	        echo "no build.rpm:$build"
-        return 1
+	echo "no build.rpm:$build"
+	echo "usage: need give the rpm name in present path or absolute rpm path"
+	echo "  or no parameter will search and install first matched rpm file"
+	return 1
 }
 
 echo "build:$build"
+echo "rm -rf $home/lib/modules"
+rm -rf $home/lib/modules
+echo "rm -rf $home/boot/System*"
+rm -rf $home/boot/System*
+echo "rm -rf $home/boot/vmlinu*"
+rm -rf $home/boot/vmlinu*
+
 echo "rpm2cpio $build | cpio -idmv"
 rpm2cpio $build | cpio -idmv
 module=$(ls ${home}/lib/modules/)
