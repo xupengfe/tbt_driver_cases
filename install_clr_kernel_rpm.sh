@@ -10,7 +10,7 @@ else
 	build=$(ls -1 kernel-*rpm | head -n 1)
 fi
 
-[[ -n "$build" ]] || {
+[[ -e "$build" ]] || {
 	echo "no build.rpm:$build"
 	echo "usage: need give the rpm name in present path or absolute rpm path"
 	echo "  or no parameter will search and install first matched rpm file"
