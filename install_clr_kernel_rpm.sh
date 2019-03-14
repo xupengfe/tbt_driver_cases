@@ -14,7 +14,7 @@ fi
 	echo "no build.rpm:$build"
 	echo "usage: need give the rpm name in present path or absolute rpm path"
 	echo "  or no parameter will search and install first matched rpm file"
-	return 1
+	exit 1
 }
 
 echo "build:$build"
@@ -30,7 +30,7 @@ rpm2cpio $build | cpio -idmv
 module=$(ls ${home}/lib/modules/)
 [[ -n "$module" ]] || {
 	echo "lib/modules is null:$module"
-	return 1
+	exit 1
 }
 echo "cp -r ${home}/lib/modules/$module /usr/lib/modules/"
 cp -r ${home}/lib/modules/$module /usr/lib/modules/
@@ -52,7 +52,7 @@ echo "mount $node /mnt"
 mount $node /mnt
 [[ -e "$loader" ]] || {
 	echo "no $loader file"
-	return 1
+	exit 1
 }
 
 default=$(cat $loader | grep default | head -n 1)
@@ -61,7 +61,7 @@ echo "$default"
 	echo "no default in $loader, add it"
 	echo "sed -i 1idefault $module $loader"
 	sed -i "1idefault $module" $loader
-	return 0
+	exit 0
 }
 echo "sed -i s/$default/default $module/g $loader"
 sed -i s/"$default"/"default $module"/g $loader
