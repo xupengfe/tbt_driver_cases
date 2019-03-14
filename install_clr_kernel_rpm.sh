@@ -27,3 +27,22 @@ echo "installkernel $module $vmlinuz $system /boot"
 installkernel $module $vmlinuz $system /boot
 echo "cp $config /lib/kernel/"
 cp $config /lib/kernel/
+
+echo "mount /dev/sda1 /mnt"
+mount /dev/sda1 /mnt
+loader="/mnt/loader/loader.conf"
+[[ -e "$loader" ]] || {
+	echo "no $loader file"
+	return 1
+}
+
+default=$(cat $loader | grep default | head -n 1)
+echo "$default"
+[[ -n "$default" ]] || {
+	echo "no default in $loader, add it"
+	echo "sed -i 1idefault $module $loader"
+	sed -i "1idefault $module" $loader
+	return 0
+}
+echo "sed -i s/$default/default $module/g $loader"
+sed -i s/"$default"/"default $module"/g $loader
