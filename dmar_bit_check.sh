@@ -1,6 +1,7 @@
 #!/bin/bash
 dmar=""
 result=""
+
 echo "echo y | acpidump -o -f acpi.dump"
 echo y | acpidump -o acpi.dump
 echo "acpixtract -f -a acpi.dump"
