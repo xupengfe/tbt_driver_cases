@@ -63,5 +63,5 @@ echo "$default"
 	sed -i "1idefault $module" $loader
 	exit 0
 }
-echo "sed -i s/$default/default $module/g $loader"
+echo "sed -i s/$default/default linux-$module/g $loader"
 sed -i s/"$default"/"default $module"/g $loader
