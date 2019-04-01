@@ -69,7 +69,7 @@ TBT_PATH="/sys/bus/thunderbolt/devices"
 REGEX_DEVICE="-"
 REGEX_DOMAIN="domain"
 #DEVICE_FILES=("authorized" "device" "device_name" "nvm_authenticate" "nvm_version" "uevent" "unique_id" "vendor" "vendor_name")
-export DEVICE_FILES="authorized device device_name link_speed  link_width nvm_authenticate nvm_version uevent unique_id vendor vendor_name power/control"
+export DEVICE_FILES="authorized device device_name link_speed link_width nvm_authenticate nvm_version uevent unique_id vendor vendor_name power/control"
 export POWER_FILES="power/control power/runtime_status power/runtime_enabled"
 export DOMAIN_FILES="security uevent"
 AUTHORIZE_FILE="authorized"
@@ -452,7 +452,7 @@ topo_tbt_show(){
     topo_view "$domain" "$t3"
   done
   topo_result=$(cat $TOPO_FILE)
-  [[ -n "$topo_result" ]] || { 
+  [[ -n "$topo_result" ]] || {
     echo "tbt $TOPO_FILE is null:$topo_result!!!"
   }
 }
