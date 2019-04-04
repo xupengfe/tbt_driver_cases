@@ -121,7 +121,7 @@ test_tbt() {
       echo "done" > $BIOS_DATA/all_set_done.txt
       ;;
     all_set_done.txt)
-      echo "All tbt cases finished, press any key to confirm to rerun, or Ctrl+C if previous step fails"
+      echo "All tbt cases finished, press any key to confirm to rerun, or Ctrl+C if you don't want to rerun TBT cases"
       read -n1 -r -p "Press any key to continue..." key
       echo "$DATE" > $DATE_FILE
       echo "$DATE: All tbt cases finished, rerun tbt cases at $(date +%m-%d_%H_%M)" >> $run_tbt_file
