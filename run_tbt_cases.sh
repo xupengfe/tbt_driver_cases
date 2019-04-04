@@ -32,17 +32,17 @@ find_usb() {
     if [[ $? -eq 0 ]]; then
       if [[ -e "$key_file" ]]; then
         echo "found $key_file in $node"
-	BIOS_USB_NODE=$node
+        BIOS_USB_NODE=$node
         ls -ltrha $key_file
-	break
+        break
       else
-	echo "$node didn't contain $key_file"
-	umount $BIOS_DATA
-	continue
+        echo "$node didn't contain $key_file"
+        umount $BIOS_DATA
+        continue
       fi
     else
         echo "mount $node failed, continue"
-	continue
+        continue
     fi
   done
   if [[ -z "$BIOS_USB_NODE" ]]; then
