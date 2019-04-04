@@ -7,6 +7,7 @@ LOG_PATH="/opt/logs/TBT_LOG"
 TBT_LOG="/opt/logs/TBT_${LINUX_VER}_${DATE}"
 BIOS_DATA="/bios_data"
 DATE_FILE="${BIOS_DATA}/date"
+TBT_COMMONS="tbt_secure_tests tbt_bat_tests tbt_func_tests tbt_userspace_tests tbt_hotplug_tests tbt_rtd3_tests tbt_suspend_resume_tests tbt_preboot_tests tbt_nvm_tests tbt_vtd_tests"
 PF=$1
 
 find_usb() {
@@ -57,6 +58,8 @@ test_tbt() {
   run_tbt_file="${LOG_PATH}/run_tbt.log"
   all_set_txt="${BIOS_DATA}/*set*.txt"
   origin_date=$(cat $DATE_FILE)
+  tbt_common=""
+  tbt_log_file=""
 
   if [[ -z "$origin_date" ]]; then
     TBT_LOG="/opt/logs/TBT_${LINUX_VER}_${DATE}"
@@ -102,10 +105,18 @@ test_tbt() {
     secure_set_done.txt)
       cd $ddt_path
       echo "secure mode test" >> $run_tbt_file
-      echo "./runtests.sh -p $PF -P $PF -f ddt_intel/tbt_secure_tests,ddt_intel/tbt_func_tests -o $TBT_LOG -c" >> $run_tbt_file
-      ./runtests.sh -p $PF -P $PF -f ddt_intel/tbt_secure_tests,ddt_intel/tbt_func_tests -o $TBT_LOG -c
-      echo "./runtests.sh -p $PF -P $PF -g tbt_common_subset -o $TBT_LOG -c" >> $run_tbt_file
-      ./runtests.sh -p $PF -P $PF -g tbt_common_subset -o $TBT_LOG -c
+
+      for tbt_common in ${TBT_COMMONS}; do
+        tbt_log_file="DDT_${tbt_common}.log"
+        if [[ -e "${TBT_LOG}/${tbt_log_file}" ]]; then
+          echo "Already ran ${TBT_LOG}/${tbt_log_file}, skip at  $(date +%m-%d_%H_%M)" >> $run_tbt_file
+          continue
+        else
+          echo "./runtests.sh -p $PF -P $PF -f ddt_intel/${tbt_common} -o $TBT_LOG -c" >> $run_tbt_file
+          ./runtests.sh -p $PF -P $PF -f ddt_intel/${tbt_common} -o $TBT_LOG -c
+        fi
+      done
+
       rm -rf $all_set_txt
       echo "$(date +%m-%d_%H_%M): delete *set*.txt, set dp_set.txt in $BIOS_DATA" >> $run_tbt_file
       echo "next" > $BIOS_DATA/dp_set.txt
