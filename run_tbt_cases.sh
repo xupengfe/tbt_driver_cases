@@ -125,12 +125,14 @@ test_tbt() {
       read -n1 -r -p "Press any key to continue..." key
       echo "$DATE" > $DATE_FILE
       echo "$DATE: All tbt cases finished, rerun tbt cases at $(date +%m-%d_%H_%M)" >> $run_tbt_file
+      rm -rf $all_set_txt
       echo "next" > $BIOS_DATA/none_set.txt
       reboot
       ;;
     *)
       echo "Rerun tbt cases"
       echo "$DATE: Rerun tbt cases" >> $run_tbt_file
+      rm -rf $all_set_txt
       echo "next" > $BIOS_DATA/none_set.txt
       echo "$DATE" > $DATE_FILE
       reboot
