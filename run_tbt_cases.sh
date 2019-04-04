@@ -24,7 +24,7 @@ find_usb() {
     mkdir $BIOS_DATA
   }
 
-  umount $BIOS_DATA
+  umount -f $BIOS_DATA
 
   for node in ${nodes}; do
     echo "Check $node:"
