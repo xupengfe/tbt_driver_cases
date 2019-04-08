@@ -10,11 +10,13 @@ DATE_FILE="${BIOS_DATA}/date"
 TBT_COMMONS="tbt_secure_tests tbt_bat_tests tbt_func_tests tbt_userspace_tests tbt_hotplug_tests tbt_rtd3_tests tbt_suspend_resume_tests tbt_preboot_tests tbt_nvm_tests tbt_vtd_tests"
 PF_FILE="${BIOS_DATA}/platform"
 PF=$1
+FUNC=$2
 
 usage() {
   cat <<__EOF
-  usage: ./${0##*/} platform_rvp
+  usage: ./${0##*/} platform_rvp FUNC
     platform_rvp: example cfl-h-rvp | whl-u-rvp | cml-u-rvp | aml-y-rvp | icl-u-rvp
+    FUNC: optional example none|user|secure|dp
 __EOF
 }
 
@@ -104,6 +106,19 @@ test_tbt() {
   echo "**********************************" >> $run_tbt_file
   echo "$DATE, ddt path:$ddt_path" >> $run_tbt_file
 
+
+  case ${FUNC} in
+    none|user|secure|dp)
+      rm -rf $all_set_txt
+      echo "$(date +%m-%d_%H_%M): FUNC:$FUNC, set ${FUNC}_set.txt in $BIOS_DATA" >> $run_tbt_file
+      echo "next" > $BIOS_DATA/${FUNC}_set.txt
+      reboot
+      ;;
+    *)
+      echo "FUNC:$FUNC" >> $run_tbt_file
+      ;;
+  esac
+
   case ${tbt_done_file} in
     none_set_done.txt)
       cd $ddt_path
@@ -177,4 +192,5 @@ test_tbt() {
 
 check_pf
 find_usb
+
 test_tbt
