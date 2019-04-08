@@ -108,7 +108,7 @@ test_tbt() {
     none_set_done.txt)
       cd $ddt_path
       echo "none mode test" >> $run_tbt_file
-      echo "./runtests.sh -p $PF -P $PF -f ddt_intel/tbt_none_tests,ddt_intel/tbt_func_tests -o $TBT_LOG -c" >> $run_tbt_file
+      echo "./runtests.sh -p $PF -P $PF -f ddt_intel/tbt_none_tests -o $TBT_LOG -c" >> $run_tbt_file
       ./runtests.sh -p $PF -P $PF -f ddt_intel/tbt_none_tests,ddt_intel/tbt_func_tests -o $TBT_LOG -c
       rm -rf $all_set_txt
       echo "$(date +%m-%d_%H_%M): delete *set*.txt, set user_set.txt in $BIOS_DATA" >> $run_tbt_file
@@ -120,7 +120,7 @@ test_tbt() {
     user_set_done.txt)
       cd $ddt_path
       echo "user mode test" >> $run_tbt_file
-      echo "./runtests.sh -p $PF -P $PF -f ddt_intel/tbt_user_tests,ddt_intel/tbt_func_tests -o $TBT_LOG -c" >> $run_tbt_file
+      echo "./runtests.sh -p $PF -P $PF -f ddt_intel/tbt_user_tests -o $TBT_LOG -c" >> $run_tbt_file
       ./runtests.sh -p $PF -P $PF -f ddt_intel/tbt_user_tests,ddt_intel/tbt_func_tests -o $TBT_LOG -c
       rm -rf $all_set_txt
       echo "$(date +%m-%d_%H_%M): delete *set*.txt, set secure_set.txt in $BIOS_DATA" >> $run_tbt_file
