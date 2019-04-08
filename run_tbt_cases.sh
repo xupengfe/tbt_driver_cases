@@ -19,7 +19,7 @@ __EOF
 }
 
 find_usb() {
-  nodes=$(lsblk | grep ^sd | cut -d ' ' -f 1)
+  nodes=$(ls -1 /dev/sd* | awk -F "/dev/" '{print $2}')
   node=""
   key_file="/bios_data/startup.nsh"
 
