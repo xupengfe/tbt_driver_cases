@@ -8,7 +8,8 @@ TBT_LOG="/opt/logs/TBT_${LINUX_VER}_${DATE}"
 BIOS_DATA="/bios_data"
 DATE_FILE="${BIOS_DATA}/date"
 TBT_COMMONS="tbt_secure_tests tbt_bat_tests tbt_func_tests tbt_userspace_tests tbt_hotplug_tests tbt_rtd3_tests tbt_suspend_resume_tests tbt_preboot_tests tbt_nvm_tests tbt_vtd_tests"
-PF=$1
+PF_FILE="${BIOS_DATA}/platform"
+PF=""
 
 find_usb() {
   nodes=$(lsblk | grep ^sd | cut -d ' ' -f 1)
@@ -50,6 +51,18 @@ find_usb() {
     echo "No $key_file in nodes, exit"
     exit 1
   fi
+}
+
+find_pf() {
+  [[ -e "$PF_FILE" ]] || {
+    echo "file $PF_FILE could not find at $(date +%m-%d_%H_%M)" >> $run_tbt_file
+    exit 1
+  }
+  PF=$(cat $PF_FILE)
+  [[ -n "$PF" ]] || {
+    echo "PF is null:$PF, exit at $(date +%m-%d_%H_%M)" >> $run_tbt_file
+    exit 1
+  }
 }
 
 test_tbt() {
@@ -144,4 +157,5 @@ test_tbt() {
 }
 
 find_usb
+find_pf
 test_tbt
