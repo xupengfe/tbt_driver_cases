@@ -55,10 +55,10 @@ find_usb() {
 
 find_pf() {
   [[ -e "$PF_FILE" ]] || {
-    echo "file $PF_FILE could not find at $(date +%m-%d_%H_%M)" >> $run_tbt_file
+    echo "file ${PF_FILE} could not find at $(date +%m-%d_%H_%M)" >> $run_tbt_file
     exit 1
   }
-  PF=$(cat $PF_FILE)
+  PF=$(cat ${PF_FILE})
   [[ -n "$PF" ]] || {
     echo "PF is null:$PF, exit at $(date +%m-%d_%H_%M)" >> $run_tbt_file
     exit 1

@@ -71,8 +71,8 @@ check_pf() {
   }
 
   find_usb
-  echo "set $PF in $PF_FILE at $(date +%Y-%m-%d_%H_%M)" >> $run_tbt_file
-  echo "$PF" > $PF_FILE
+  echo "set $PF in ${PF_FILE} at $(date +%Y-%m-%d_%H_%M)" >> $run_tbt_file
+  echo "$PF" > ${PF_FILE}
   else
     echo "PF not defined when execute script"
     usage
