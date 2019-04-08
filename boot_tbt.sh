@@ -13,6 +13,10 @@ PF_FILE="${BIOS_DATA}/platform"
 PF=""
 
 find_usb() {
+  # wait 3s, make system boot up and generate /dev/sd* sysfs files
+  echo "sleep 3"
+  sleep 3
+
   nodes=$(ls -1 /dev/sd* | awk -F "/dev/" '{print $2}')
   node=""
   key_file="/bios_data/startup.nsh"
