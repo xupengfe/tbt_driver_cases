@@ -8,7 +8,15 @@ TBT_LOG="/opt/logs/TBT_${LINUX_VER}_${DATE}"
 BIOS_DATA="/bios_data"
 DATE_FILE="${BIOS_DATA}/date"
 TBT_COMMONS="tbt_secure_tests tbt_bat_tests tbt_func_tests tbt_userspace_tests tbt_hotplug_tests tbt_rtd3_tests tbt_suspend_resume_tests tbt_preboot_tests tbt_nvm_tests tbt_vtd_tests"
+PF_FILE="${BIOS_DATA}/platform"
 PF=$1
+
+usage() {
+  cat <<__EOF
+  usage: ./${0##*/} platform_rvp
+    platform_rvp: example cfl-h-rvp | whl-u-rvp | cml-u-rvp | aml-y-rvp | icl-u-rvp
+__EOF
+}
 
 find_usb() {
   nodes=$(lsblk | grep ^sd | cut -d ' ' -f 1)
@@ -52,6 +60,24 @@ find_usb() {
   fi
 }
 
+check_pf() {
+  if [[ -n "$PF" ]]; then
+    [[ "$PF" == *"rvp"* ]] || {
+      echo "PF:$PF, pltform was not correct! exit"
+      usage
+      exit 3
+  }
+
+  find_usb
+  echo "set $PF in $PF_FILE at $(date +%Y-%m-%d_%H_%M)" >> $run_tbt_file
+  echo "$PF" > $PF_FILE
+  else
+    echo "PF not defined when execute script"
+    usage
+    exit 2
+  fi
+}
+
 test_tbt() {
   tbt_done_file=""
   ddt_path=$(ls -1 /home/ltp-ddt_* | grep ^/home | tail -n 1 | cut -d ':' -f 1)
@@ -72,7 +98,6 @@ test_tbt() {
     mkdir -p $LOG_PATH
   }
 
-  [[ -z "$PF" ]] && PF="cfl-h-rvp"
   cd $BIOS_DATA
   tbt_done_file=$(ls -1 *set_done.txt)
   echo >> $run_tbt_file
@@ -150,5 +175,6 @@ test_tbt() {
   esac
 }
 
+check_pf
 find_usb
 test_tbt
