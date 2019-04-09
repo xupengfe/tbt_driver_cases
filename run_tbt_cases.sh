@@ -132,6 +132,8 @@ test_tbt() {
       echo "none mode test" >> $RUN_TBT_FILE
       echo "./runtests.sh -p $PF -P $PF -f ddt_intel/tbt_none_tests -o $TBT_LOG -c" >> $RUN_TBT_FILE
       ./runtests.sh -p $PF -P $PF -f ddt_intel/tbt_none_tests,ddt_intel/tbt_func_tests -o $TBT_LOG -c
+      echo "./runtests.sh -p $PF -P $PF -f ddt_intel/tbt_func_tests -o $TBT_LOG -c" >> $RUN_TBT_FILE
+      ./runtests.sh -p $PF -P $PF -f ddt_intel/tbt_func_tests -o $TBT_LOG -c
       rm -rf $all_set_txt
       echo "$(date +%m-%d_%H_%M): delete *set*.txt, set user_set.txt in $BIOS_DATA" >> $RUN_TBT_FILE
       echo "next" > $BIOS_DATA/user_set.txt
