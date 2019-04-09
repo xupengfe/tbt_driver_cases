@@ -17,7 +17,7 @@ usage() {
   cat <<__EOF
   usage: ./${0##*/} platform_rvp FUNC
     platform_rvp: example cfl-h-rvp | whl-u-rvp | cml-u-rvp | aml-y-rvp | icl-u-rvp
-    FUNC: optional example none|user|secure|dp or rerun
+    FUNC: optional example none|user|secure|dp or rerun | clear
 __EOF
 }
 
@@ -120,6 +120,11 @@ test_tbt() {
       echo "next" > $BIOS_DATA/none_set.txt
       echo "$DATE" > $DATE_FILE
       reboot
+      ;;
+    clear)
+      rm -rf $all_set_txt
+      echo "$(date +%m-%d_%H_%M): FUNC:$FUNC, clear! Clean set txt and set all_set_done.txt in $BIOS_DATA"
+      echo "next" > $BIOS_DATA/all_set_done.txt
       ;;
     *)
       echo "FUNC:$FUNC" >> $RUN_TBT_FILE
