@@ -88,6 +88,7 @@ test_tbt() {
   origin_date=$(cat $DATE_FILE)
   tbt_common=""
   tbt_log_file=""
+  present_date=$(date +%m-%d_%H_%M)
 
   if [[ -z "$origin_date" ]]; then
     TBT_LOG="/opt/logs/TBT_${LINUX_VER}_${DATE}"
@@ -146,6 +147,8 @@ test_tbt() {
       echo "next" > $BIOS_DATA/user_set.txt
       ls $BIOS_DATA
       echo "$(ls $BIOS_DATA)" >> $RUN_TBT_FILE
+      dmesg > "${TBT_LOG}/dmesg_none_${present_date}.txt"
+      echo "record dmesg:${TBT_LOG}/dmesg_none_${present_date}.txt"
       reboot
       ;;
     user_set_done.txt)
@@ -156,6 +159,8 @@ test_tbt() {
       rm -rf $all_set_txt
       echo "$(date +%m-%d_%H_%M): delete *set*.txt, set secure_set.txt in $BIOS_DATA" >> $RUN_TBT_FILE
       echo "next" > $BIOS_DATA/secure_set.txt
+      dmesg > "${TBT_LOG}/dmesg_user_${present_date}.txt"
+      echo "record dmesg:${TBT_LOG}/dmesg_user_${present_date}.txt"
       reboot
       ;;
     secure_set_done.txt)
@@ -176,6 +181,8 @@ test_tbt() {
       rm -rf $all_set_txt
       echo "$(date +%m-%d_%H_%M): delete *set*.txt, set dp_set.txt in $BIOS_DATA" >> $RUN_TBT_FILE
       echo "next" > $BIOS_DATA/dp_set.txt
+      dmesg > "${TBT_LOG}/dmesg_secure_${present_date}.txt"
+      echo "record dmesg:${TBT_LOG}/dmesg_secure_${present_date}.txt"
       reboot
       ;;
     dp_set_done.txt)
@@ -186,6 +193,8 @@ test_tbt() {
       rm -rf $all_set_txt
       echo "$(date +%m-%d_%H_%M): delete *set*.txt, set all_set_done.txt in $BIOS_DATA" >> $RUN_TBT_FILE
       echo "done" > $BIOS_DATA/all_set_done.txt
+      dmesg > "${TBT_LOG}/dmesg_dp_${present_date}.txt"
+      echo "record dmesg:${TBT_LOG}/dmesg_dp_${present_date}.txt"
       ;;
     all_set_done.txt)
       echo "All tbt cases finished, press any key to confirm to rerun, or Ctrl+C if you don't want to rerun TBT cases"
