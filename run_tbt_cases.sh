@@ -125,6 +125,7 @@ test_tbt() {
       rm -rf $all_set_txt
       echo "$(date +%m-%d_%H_%M): FUNC:$FUNC, clear! Clean set txt and set all_set_done.txt in $BIOS_DATA"
       echo "next" > $BIOS_DATA/all_set_done.txt
+      echo "$DATE" > $DATE_FILE
       exit 0
       ;;
     *)
