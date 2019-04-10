@@ -103,7 +103,8 @@ find_root_pci()
          ROOT_PCI="0000:00:07.3"
          ;;
        *)
-         echo "ICL platform didn't find root pci!!!"
+         echo "ICL platform didn't find root pci, set 0000:00:07.0 as default!!!"
+         ROOT_PCI="0000:00:07.0"
          ;;
      esac
   else
@@ -118,7 +119,7 @@ pci_main()
   local dev_path="/sys/bus/pci/devices"
   local rstate=""
   local icl=$(dmidecode | grep "ICL")
-  
+
   find_root_pci
   if [[ -z "$ROOT_PCI" ]]; then
     if [[ "$CHECK_TIME" -eq 0 ]]; then
@@ -219,7 +220,7 @@ pci_main()
 #	     "$tbt" "$pci_type" "$control" "$run_status" "$real_status"
      pci_info=$(printf "$PCI->%-8s type:%-18s  control:%-12s runtime_status:%-12s real_status:%-12s\n" \
 		"$tbt" "$pci_type" "$control" "$run_status" "$real_status")
-     echo "$pci_info" >> $pci_log 
+     echo "$pci_info" >> $pci_log
 
      if [[ -n "$ROOT_PCI" ]]; then
        [[ "$PCI" == "$ROOT_PCI" ]] && echo "auto" > $PCI_PATH/$PCI/power/control
