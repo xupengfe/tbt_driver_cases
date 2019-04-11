@@ -10,6 +10,7 @@ DATE_FILE="${BIOS_DATA}/date"
 TBT_COMMONS="tbt_secure_tests tbt_bat_tests tbt_func_tests tbt_userspace_tests tbt_hotplug_tests tbt_rtd3_tests tbt_suspend_resume_tests tbt_preboot_tests tbt_nvm_tests tbt_vtd_tests"
 RUN_TBT_FILE="${LOG_PATH}/run_tbt.log"
 PF_FILE="${BIOS_DATA}/platform"
+ONLY_FILE="only_set.txt"
 PF=$1
 FUNC=$2
 
@@ -111,8 +112,9 @@ test_tbt() {
   case ${FUNC} in
     none|user|secure|dp)
       rm -rf $all_set_txt
-      echo "$(date +%m-%d_%H_%M): FUNC:$FUNC, set ${FUNC}_set.txt in $BIOS_DATA" >> $RUN_TBT_FILE
-      echo "next" > $BIOS_DATA/${FUNC}_set.txt
+      echo "$(date +%m-%d_%H_%M): FUNC:$FUNC, set ${FUNC}_set.txt and ${ONLY_FILE} in $BIOS_DATA" >> $RUN_TBT_FILE
+      echo "next" > ${BIOS_DATA}/${FUNC}_set.txt
+      echo "only" > ${BIOS_DATA}/${ONLY_FILE}
       reboot
       ;;
     rerun)
@@ -142,8 +144,14 @@ test_tbt() {
       ./runtests.sh -p $PF -P $PF -f ddt_intel/tbt_none_tests,ddt_intel/tbt_func_tests -o $TBT_LOG -c
       echo "./runtests.sh -p $PF -P $PF -f ddt_intel/tbt_func_tests -o $TBT_LOG -c" >> $RUN_TBT_FILE
       ./runtests.sh -p $PF -P $PF -f ddt_intel/tbt_func_tests -o $TBT_LOG -c
+
       rm -rf $all_set_txt
-      echo "$(date +%m-%d_%H_%M): delete *set*.txt, set user_set.txt in $BIOS_DATA" >> $RUN_TBT_FILE
+      if [[ -e "${BIOS_DATA}/${ONLY_FILE}" ]]; then
+        echo "$(date +%m-%d_%H_%M): contain ${ONLY_FILE}, delete *set*.txt" >> $RUN_TBT_FILE
+      else
+        echo "$(date +%m-%d_%H_%M): delete *set*.txt, set user_set.txt in $BIOS_DATA" >> $RUN_TBT_FILE
+        echo "next" > $BIOS_DATA/user_set.txt
+      fi
       echo "next" > $BIOS_DATA/user_set.txt
       ls $BIOS_DATA
       echo "$(ls $BIOS_DATA)" >> $RUN_TBT_FILE
@@ -156,9 +164,14 @@ test_tbt() {
       echo "user mode test" >> $RUN_TBT_FILE
       echo "./runtests.sh -p $PF -P $PF -f ddt_intel/tbt_user_tests -o $TBT_LOG -c" >> $RUN_TBT_FILE
       ./runtests.sh -p $PF -P $PF -f ddt_intel/tbt_user_tests,ddt_intel/tbt_func_tests -o $TBT_LOG -c
+
       rm -rf $all_set_txt
-      echo "$(date +%m-%d_%H_%M): delete *set*.txt, set secure_set.txt in $BIOS_DATA" >> $RUN_TBT_FILE
-      echo "next" > $BIOS_DATA/secure_set.txt
+      if [[ -e "${BIOS_DATA}/${ONLY_FILE}" ]]; then
+        echo "$(date +%m-%d_%H_%M): contain ${ONLY_FILE}, delete *set*.txt" >> $RUN_TBT_FILE
+      else
+        echo "$(date +%m-%d_%H_%M): delete *set*.txt, set secure_set.txt in $BIOS_DATA" >> $RUN_TBT_FILE
+        echo "next" > $BIOS_DATA/secure_set.txt
+      fi
       dmesg > "${TBT_LOG}/dmesg_user_${present_date}.txt"
       echo "record dmesg:${TBT_LOG}/dmesg_user_${present_date}.txt"
       reboot
@@ -179,8 +192,12 @@ test_tbt() {
       done
 
       rm -rf $all_set_txt
-      echo "$(date +%m-%d_%H_%M): delete *set*.txt, set dp_set.txt in $BIOS_DATA" >> $RUN_TBT_FILE
-      echo "next" > $BIOS_DATA/dp_set.txt
+      if [[ -e "${BIOS_DATA}/${ONLY_FILE}" ]]; then
+        echo "$(date +%m-%d_%H_%M): contain ${ONLY_FILE}, delete *set*.txt" >> $RUN_TBT_FILE
+      else
+        echo "$(date +%m-%d_%H_%M): delete *set*.txt, set dp_set.txt in $BIOS_DATA" >> $RUN_TBT_FILE
+        echo "next" > $BIOS_DATA/dp_set.txt
+      fi
       dmesg > "${TBT_LOG}/dmesg_secure_${present_date}.txt"
       echo "record dmesg:${TBT_LOG}/dmesg_secure_${present_date}.txt"
       reboot
@@ -190,28 +207,27 @@ test_tbt() {
       echo "dp mode test" >> $RUN_TBT_FILE
       echo "./runtests.sh -p $PF -P $PF -f ddt_intel/tbt_dp_tests -o $TBT_LOG -c" >> $RUN_TBT_FILE
       ./runtests.sh -p $PF -P $PF -f ddt_intel/tbt_dp_tests -o $TBT_LOG -c
+
       rm -rf $all_set_txt
-      echo "$(date +%m-%d_%H_%M): delete *set*.txt, set all_set_done.txt in $BIOS_DATA" >> $RUN_TBT_FILE
-      echo "done" > $BIOS_DATA/all_set_done.txt
+      if [[ -e "${BIOS_DATA}/${ONLY_FILE}" ]]; then
+        echo "$(date +%m-%d_%H_%M): contain ${ONLY_FILE}, delete *set*.txt" >> $RUN_TBT_FILE
+      else
+        echo "$(date +%m-%d_%H_%M): delete *set*.txt, set all_set_done.txt in $BIOS_DATA" >> $RUN_TBT_FILE
+        echo "done" > $BIOS_DATA/all_set_done.txt
+      fi
       dmesg > "${TBT_LOG}/dmesg_dp_${present_date}.txt"
       echo "record dmesg:${TBT_LOG}/dmesg_dp_${present_date}.txt"
       ;;
     all_set_done.txt)
-      echo "All tbt cases finished, press any key to confirm to rerun, or Ctrl+C if you don't want to rerun TBT cases"
-      read -n1 -r -p "Press any key to continue..." key
-      echo "$DATE" > $DATE_FILE
-      echo "$DATE: All tbt cases finished, rerun tbt cases at $(date +%m-%d_%H_%M)" >> $RUN_TBT_FILE
+      echo "All tbt cases finished, exit 0"
+      echo "$DATE: All tbt cases finished preset time $(date +%m-%d_%H_%M), systemd tbt exit" >> $RUN_TBT_FILE
       rm -rf $all_set_txt
-      echo "next" > $BIOS_DATA/none_set.txt
-      reboot
+      exit 0
       ;;
     *)
-      echo "Rerun tbt cases"
-      echo "$DATE: Rerun tbt cases" >> $RUN_TBT_FILE
+      echo "$DATE: no useful *set_done.txt, systemd tbt exit, present time $(date +%m-%d_%H_%M)" >> $RUN_TBT_FILE
       rm -rf $all_set_txt
-      echo "next" > $BIOS_DATA/none_set.txt
-      echo "$DATE" > $DATE_FILE
-      reboot
+      exit 0
   esac
 }
 
