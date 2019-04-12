@@ -104,8 +104,8 @@ test_tbt() {
       echo "none mode test" >> $RUN_TBT_FILE
       echo "./runtests.sh -p $PF -P $PF -f ddt_intel/tbt_none_tests -o $TBT_LOG -c" >> $RUN_TBT_FILE
       ./runtests.sh -p $PF -P $PF -f ddt_intel/tbt_none_tests -o $TBT_LOG -c
-      echo "./runtests.sh -p $PF -P $PF -f ddt_intel/tbt_func_tests -o $TBT_LOG -c" >> $RUN_TBT_FILE
-      ./runtests.sh -p $PF -P $PF -f ddt_intel/tbt_func_tests -o $TBT_LOG -c
+      #echo "./runtests.sh -p $PF -P $PF -f ddt_intel/tbt_func_tests -o $TBT_LOG -c" >> $RUN_TBT_FILE
+      #./runtests.sh -p $PF -P $PF -f ddt_intel/tbt_func_tests -o $TBT_LOG -c
 
       dmesg > "${TBT_LOG}/dmesg_none_${present_date}.txt"
       echo "record dmesg:${TBT_LOG}/dmesg_none_${present_date}.txt"
