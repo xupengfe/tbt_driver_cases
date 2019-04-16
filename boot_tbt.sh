@@ -73,7 +73,7 @@ find_pf() {
 
 test_tbt() {
   tbt_done_file=""
-  ddt_path=$(ls -1 /home/ltp-ddt_* | grep ^/home | tail -n 1 | cut -d ':' -f 1)
+  ddt_path=$(ls -1 /home/* | grep ^/home | grep "ltp-ddt_" | tail -n 1 | cut -d ':' -f 1)
   all_set_txt="${BIOS_DATA}/*set*.txt"
   origin_date=$(cat $DATE_FILE)
   tbt_common=""
