@@ -49,6 +49,11 @@ cp_nsh() {
     echo "XmlCliKnobs.efi AP -s \"SecurityMode=0x02\"" >> ${USB_PATH}/set_secure.nsh
     echo "XmlCliKnobs.efi AP -s \"SecurityMode=0x03\"" >> ${USB_PATH}/set_dp.nsh
   fi
+
+  echo "Attention!!! Already delete ${USB_PATH}/bios_set.nsh for TBT BIOS setting"
+  rm -rf ${USB_PATH}/bios_set.nsh
+
+  echo "Copy set_none/user/secure/dp.nsh into BIOS setting USB done."
 }
 
 cp_nsh

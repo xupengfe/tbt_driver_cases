@@ -40,4 +40,15 @@ if exist dp_set.txt then
     boot.nsh
   endif
 endif
+
+if exist bios_set.nsh
+  if not exist bios_set_done.txt then
+    bios_set.nsh
+    echo "pass" > bios_set_done.txt
+    reset
+  else
+    boot.nsh
+  endif
+endif
+
 boot.nsh
