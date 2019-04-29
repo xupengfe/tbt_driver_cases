@@ -176,7 +176,7 @@ pci_main()
 
 
   root_real_status=$(cat $PCI_PATH/$ROOT_PCI/firmware_node/real_power_state 2>/dev/null)
-  port_status=$(cat $PCI_PATH/$ROOT_PCI/firmware_node/power_state 2>/dev/null)
+  root_port_status=$(cat $PCI_PATH/$ROOT_PCI/firmware_node/power_state 2>/dev/null)
   root_run_status=$(cat $PCI_PATH/$ROOT_PCI/power/runtime_status)
   root_control=$(cat $PCI_PATH/$ROOT_PCI/power/control)
   root_type=$(lspci -v -s $ROOT_PCI 2> /dev/null | grep "Kernel driver in use:" | awk -F "in use: " '{print $2}')
@@ -189,9 +189,10 @@ pci_main()
       real_status=""
       if [[ "$PCI" == "$ROOT_PCI" ]]; then
         real_status="$root_real_status"
-	run_status="$root_run_status"
+        port_status="$root_port_status"
+        run_status="$root_run_status"
         pci_control="$root_control"
-	pci_type="$root_type"
+        pci_type="$root_type"
       else
         control=$(cat $PCI_PATH/$PCI/power/control)
         run_status=$(cat $PCI_PATH/$PCI/power/runtime_status)
@@ -206,7 +207,7 @@ pci_main()
       #Check pci which contain ROOT_PCI pci, if yes it means it's tbt branch pci
       if [[ -n "$ROOT_PCI" ]]; then
         #echo "pci_content:$pci_content pci:$PCI"
-	[[ "$pci_content" == *"$ROOT_PCI"* ]] && tbt="tbt"
+        [[ "$pci_content" == *"$ROOT_PCI"* ]] && tbt="tbt"
         [[ "$PCI" == "$ROOT_PCI" ]] && tbt="tbt_root"
      fi
 
@@ -220,9 +221,9 @@ pci_main()
      [[ -z "$real_status" ]] && real_status="NA"
 
 #     printf "$PCI->%-8s type:%-18s  control:%-12s runtime_status:%-12s real_status:%-12s\n" \
-#	     "$tbt" "$pci_type" "$control" "$run_status" "$real_status"
+#     "$tbt" "$pci_type" "$control" "$run_status" "$real_status"
      pci_info=$(printf "$PCI->%-8s type:%-18s  control:%-12s runtime_status:%-12s real_status:%-12s, port_status:%-12s\n" \
-		"$tbt" "$pci_type" "$control" "$run_status" "$real_status" "$port_status")
+        "$tbt" "$pci_type" "$control" "$run_status" "$real_status" "$port_status")
      echo "$pci_info" >> $pci_log
 
      if [[ -n "$ROOT_PCI" ]]; then
@@ -232,7 +233,7 @@ pci_main()
        [[ "$tbt" == "tbt" ]] && {
          [[ "$pci_type" == *"hci"* ]] && echo "auto" > $PCI_PATH/$PCI/power/control
        }
-	 #[[ "$pci_type" == "thunderbolt" ]] && echo "auto" > $PCI_PATH/$PCI/power/control
+#[[ "$pci_type" == "thunderbolt" ]] && echo "auto" > $PCI_PATH/$PCI/power/control
      fi
   done
   cat $pci_log
