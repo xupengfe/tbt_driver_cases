@@ -154,6 +154,7 @@ pci_main()
   rstate=$(cat /sys/bus/pci/devices/$ROOT_PCI/power/runtime_status)
   #rstate=$(lspci -vv -s 03:00 2> /dev/null | grep Status | grep "PME-" | cut -d ' ' -f 2)
   local root_real_status=""
+  local port_status=""
   local root_run_status=""
   local root_control=""
   local root_type=""
@@ -174,7 +175,8 @@ pci_main()
   sleep 25
 
 
-  root_real_status=$(cat $PCI_PATH/$ROOT_PCI/firmware_node/power_state 2>/dev/null)
+  root_real_status=$(cat $PCI_PATH/$ROOT_PCI/firmware_node/real_power_state 2>/dev/null)
+  port_status=$(cat $PCI_PATH/$ROOT_PCI/firmware_node/power_state 2>/dev/null)
   root_run_status=$(cat $PCI_PATH/$ROOT_PCI/power/runtime_status)
   root_control=$(cat $PCI_PATH/$ROOT_PCI/power/control)
   root_type=$(lspci -v -s $ROOT_PCI 2> /dev/null | grep "Kernel driver in use:" | awk -F "in use: " '{print $2}')
@@ -195,8 +197,9 @@ pci_main()
         run_status=$(cat $PCI_PATH/$PCI/power/runtime_status)
         pci_type=$(lspci -v -s $PCI 2> /dev/null | grep "Kernel driver in use:" | awk -F "in use: " '{print $2}')
 
-        # comment line, due to if D3 cold, could not get the correct status. so use $PCI_PATH/XXX_PCI_BUS/power/firmware_node/power_state
-        real_status=$(cat $PCI_PATH/$PCI/firmware_node/power_state 2>/dev/null)
+        # comment line, due to if D3 cold, could not get the correct status. so use $PCI_PATH/XXX_PCI_BUS/power/firmware_node/real_power_state
+        real_status=$(cat $PCI_PATH/$PCI/firmware_node/real_power_state 2>/dev/null)
+        port_status=$(cat $PCI_PATH/$PCI/firmware_node/power_state 2>/dev/null)
         [[ -z "$real_status" ]] && real_status=$(lspci -vv -s $PCI 2> /dev/null | grep Status | grep "PME-" | cut -d ' ' -f 2)
       fi
       pci_content=$(ls -ltra $PCI_PATH/$PCI)
@@ -218,8 +221,8 @@ pci_main()
 
 #     printf "$PCI->%-8s type:%-18s  control:%-12s runtime_status:%-12s real_status:%-12s\n" \
 #	     "$tbt" "$pci_type" "$control" "$run_status" "$real_status"
-     pci_info=$(printf "$PCI->%-8s type:%-18s  control:%-12s runtime_status:%-12s real_status:%-12s\n" \
-		"$tbt" "$pci_type" "$control" "$run_status" "$real_status")
+     pci_info=$(printf "$PCI->%-8s type:%-18s  control:%-12s runtime_status:%-12s real_status:%-12s, port_status:%-12s\n" \
+		"$tbt" "$pci_type" "$control" "$run_status" "$real_status" "$port_status")
      echo "$pci_info" >> $pci_log
 
      if [[ -n "$ROOT_PCI" ]]; then
@@ -234,8 +237,8 @@ pci_main()
   done
   cat $pci_log
   echo "Before, root_real_status:$root_real_status"
-  root_real_status=$(cat $PCI_PATH/$ROOT_PCI/firmware_node/power_state 2>/dev/null)
-  echo "cat $PCI_PATH/$ROOT_PCI/firmware_node/power_state "
+  root_real_status=$(cat $PCI_PATH/$ROOT_PCI/firmware_node/real_power_state 2>/dev/null)
+  echo "cat $PCI_PATH/$ROOT_PCI/firmware_node/real_power_state "
   echo "Current, root pci real status:$root_real_status"
 
 }
