@@ -219,6 +219,7 @@ pci_main()
      [[ -z "$control" ]] && control="NA"
      [[ -z "$run_status" ]] && run_status="NA"
      [[ -z "$real_status" ]] && real_status="NA"
+     [[ -z "$port_status" ]] && port_status="NA"
 
 #     printf "$PCI->%-8s type:%-18s  control:%-12s runtime_status:%-12s real_status:%-12s\n" \
 #     "$tbt" "$pci_type" "$control" "$run_status" "$real_status"
