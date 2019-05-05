@@ -47,3 +47,5 @@ iperf3 -u -c $ip -R >> $tbt_net
 echo "iperf3 -u -c $ip -R"
 echo "6. TEST iperf3 -u -c $ip -R" >> $tbt_net
 iperf3 -u -c $ip -R >> $tbt_net
+
+echo "iperf3 test finished, result was saved in $tbt_net"
