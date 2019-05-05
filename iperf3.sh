@@ -4,7 +4,7 @@ ip=$1
 ip_host="192.168.1.10"
 local_guest_default="192.168.1.11"
 
-tbt_net="tbt_net_$(date +%m-%d_%H_%M).txt"
+tbt_net="tbt_net_$(date +%Y%m-%d_%H_%M).txt"
 
 
 [[ -n "$ip" ]] || {
