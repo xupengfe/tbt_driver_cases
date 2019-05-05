@@ -4,10 +4,8 @@ ip=$1
 ip_host="192.168.1.10"
 local_guest_default="192.168.1.11"
 
-tbt_net="tbt_net.txt"
-tbt_net_last="tbt_net_last.txt"
+tbt_net="tbt_net_$(date +%m-%d_%H_%M).txt"
 
-[[ -e "$tbt_net" ]] && mv $tbt_net $tbt_net_last
 
 [[ -n "$ip" ]] || {
 	echo "Didn't set host ip, need set local guest ip $local_guest_default by default"
@@ -19,7 +17,7 @@ tbt_net_last="tbt_net_last.txt"
 	ip=$ip_host
 	}
 
-echo "Linux kernel $(uname -r)" >> $tbt_net
+echo "$(date +%m-%d_%H_%M): Linux kernel $(uname -r)" >> $tbt_net
 echo "cmdline $(cat /proc/cmdline)" >> $tbt_net
 echo "test tbt net at $(date +%Y-%m-%d\ %H:%M:%S)" >>  $tbt_net
 echo "----------------------------------------------------------"
