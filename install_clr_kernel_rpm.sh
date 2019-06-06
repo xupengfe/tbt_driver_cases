@@ -32,6 +32,9 @@ module=$(ls ${home}/lib/modules/)
 	echo "lib/modules is null:$module"
 	exit 1
 }
+echo "rm -rf /usr/lib/modules/$module"
+rm -rf /usr/lib/modules/$module
+sleep 1
 echo "cp -r ${home}/lib/modules/$module /usr/lib/modules/"
 cp -r ${home}/lib/modules/$module /usr/lib/modules/
 sleep 1
