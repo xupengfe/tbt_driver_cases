@@ -515,6 +515,57 @@ Command sample:"./runtests.sh -p cfl-h-rvp -P cfl-h-rvp -f ddt_intel/tbt_rtd3_te
              in D3 after 30s idle.
              Then transfer file in ahci device connected by tbt, ahci should in D0.
              After 30s later should be back in D3 too.
+
 14-13 TBT_XS_FUNC_RTD3_S4_test
       Steps: Check host controller was in D3 mode, and then s4 sleep,
              after wake up and wait 8s, Controller should in D3 again.
+
+
+Part 15 - TBT SW CM tests:
+Set TBT SW CM mode on TBT AIC board.
+Command sample:"./runtests.sh -p cfl-s_cnl-h -P cfl-s_cnl-h -f ddt_intel/tbt_none_tests -o /opt/logs/tbt -c"
+Command sample:"./runtests.sh -p cfl-s_cnl-h -P cfl-s_cnl-h -f ddt_intel/tbt_user_tests -o /opt/logs/tbt -c"
+15-1  TBT_XS_FUNC_USER_MODE_TEST tbt_func_test.sh -s user
+      Steps: Security was set user, check tbt device connected,
+             set authorized to 1 successfully.
+
+15-2  TBT_XS_FUNC_MONITOR_USER_TEST tbt_func_test.sh -s monitor_user
+      Steps: Find tbt 5K monitor in user mode, and set 1 in authorized, and return success.
+
+15-3  TBT_XS_FUNC_USER_PLUG_OUT_TEST tbt_func_test.sh -s po
+      Steps: Check tbt devices connected and set user mode, then plug out all tbt devices,
+             30s later, check no tbt router like 0-1 folder exist in sysfs.
+
+15-4  TBT_XS_FUNC_USER_PLUG_IN_CHECK tbt_func_test.sh -s upic
+      Steps: In user mode, check tbt devices connected, check all tbt router folders exist
+             in sysfs files /sys/bus/thunderbolt/devices, all tbt router authorized should
+             set 0.
+
+15-5  TBT_XS_FUNC_USER_PLUG_IN_ERROR_CHECK tbt_func_test.sh -s upie
+      Steps: In user mode, check tbt devices connected, fill in invalid string in
+             authorized, all these action should reject.
+
+15-6  TBT_XS_FUNC_USER_PLUG_IN_ACC_CHECK tbt_func_test.sh -s upiac
+      Steps: In user mode, check tbt devices connected, set 1 to authorized, should return
+             success, check lspci should contain thunderbolt.
+
+15-7  TBT_XS_FUNC_USER_PLUG_IN_ACC_ERROR tbt_func_test.sh -s upiae
+      Steps: In user mode, check tbt devices connected, all tbt router authorized set 1,
+             fill in invalid string in authorized, should reject.
+
+15-8  TBT SW CM 2DP tunnel tests
+	  Steps: Connect 2 DP monitor on TR SV HR cards, both could display
+	  
+15-9  TBT SW CM 3 DP tunnels tests
+	  Steps: Connect 2 DP monitor on TR SV HR cards, both could display, connected 3rd DP
+	  monitor, which could not display, when plugged out 1st one, 3rd could display
+	  
+15-10 TBT SW CM upgrade test:
+	  Steps: upgrade TR AIC from TR_HR_4C_C1_rev41_pre4_Native_RTD3_VHPD_W_TI_6p59_NOSEC_sign#2_AIC_CM_DIS.bin
+	  to TR_HR_4C_C1_rev41_preFF_Native_RTD3_VHPD_W_TI_6p59_NOSEC_sign#2_AIC_CM_DIS.bin without issue.
+
+15-11 TBT SW TBT DEVICE CM LINK_SPEED test:
+	  Steps: check /sys/bus/thunderbolt/devices/x-x/link_speed exist and should be 10 Gb/s or 20 Gb/s
+	  
+15-12 TBT SW CM TBT DEVICE LINK_WIDTH test:
+	  Steps: cehck /sys/bus/thunderbolt/devices/x-x/link_width exist and should be 1 or 2
