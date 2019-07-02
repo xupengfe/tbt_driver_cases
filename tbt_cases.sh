@@ -554,18 +554,36 @@ Command sample:"./runtests.sh -p cfl-s_cnl-h -P cfl-s_cnl-h -f ddt_intel/tbt_use
              fill in invalid string in authorized, should reject.
 
 15-8  TBT SW CM 2DP tunnel tests
-	  Steps: Connect 2 DP monitor on TR SV HR cards, both could display
-	  
+      Steps: Connect 2 DP monitor on TR SV HR cards, both could display
+
 15-9  TBT SW CM 3 DP tunnels tests
-	  Steps: Connect 2 DP monitor on TR SV HR cards, both could display, connected 3rd DP
-	  monitor, which could not display, when plugged out 1st one, 3rd could display
-	  
+      Steps: Connect 2 DP monitor on TR SV HR cards, both could display, connected 3rd DP
+      monitor, which could not display, when plugged out 1st one, 3rd could display
+
 15-10 TBT SW CM upgrade test:
-	  Steps: upgrade TR AIC from TR_HR_4C_C1_rev41_pre4_Native_RTD3_VHPD_W_TI_6p59_NOSEC_sign#2_AIC_CM_DIS.bin
-	  to TR_HR_4C_C1_rev41_preFF_Native_RTD3_VHPD_W_TI_6p59_NOSEC_sign#2_AIC_CM_DIS.bin without issue.
+      Steps: upgrade TR AIC from TR_HR_4C_C1_rev41_pre4_Native_RTD3_VHPD_W_TI_6p59_NOSEC_sign#2_AIC_CM_DIS.bin
+      to TR_HR_4C_C1_rev41_preFF_Native_RTD3_VHPD_W_TI_6p59_NOSEC_sign#2_AIC_CM_DIS.bin without issue.
 
 15-11 TBT SW TBT DEVICE CM LINK_SPEED test:
-	  Steps: check /sys/bus/thunderbolt/devices/x-x/link_speed exist and should be 10 Gb/s or 20 Gb/s
-	  
+      Steps: check /sys/bus/thunderbolt/devices/x-x/link_speed exist and should be 10 Gb/s or 20 Gb/s
+
 15-12 TBT SW CM TBT DEVICE LINK_WIDTH test:
-	  Steps: cehck /sys/bus/thunderbolt/devices/x-x/link_width exist and should be 1 or 2
+      Steps: cehck /sys/bus/thunderbolt/devices/x-x/link_width exist and should be 1 or 2
+
+Part 16 - TBT Dual Controller tests:
+Set TBT Dual Controller tests on CML-H
+Command sample:"./runtests.sh -p cfl-s_cnl-h -P cfl-s_cnl-h -f ddt_intel/tbt_dual_controller_tests -o /opt/logs/tbt -c"
+Command sample:"./runtests.sh -p cfl-s_cnl-h -P cfl-s_cnl-h -f ddt_intel/tbt_dual_controller_tests -o /opt/logs/tbt -c"
+16-1  TBT Dual controller domain:
+      Steps: Check /sys/bus/thunderbolt/devices/domain0 and domain1 folders
+      exist.
+
+16-2 TBT Dual controller root port:
+      Steps: Check /sys/bus/thunderbolt/devices/0-0 and 1-0 folders exist
+
+16-3 TBT Dual controller pci:
+      Steps: domain0 and 0-0 used the same pci,
+      domain1 and 1-0 used the same pci.
+
+16-4 TBT Dual controller secure:
+      Step: check domian0 and 1 secure mode should same
