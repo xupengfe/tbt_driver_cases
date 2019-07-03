@@ -35,8 +35,8 @@ module=$(ls ${home}/lib/modules/)
 echo "rm -rf /usr/lib/modules/$module"
 rm -rf /usr/lib/modules/$module
 sleep 1
-echo "cp -r ${home}/lib/modules/$module /usr/lib/modules/"
-cp -r ${home}/lib/modules/$module /usr/lib/modules/
+echo "cp -rf ${home}/lib/modules/$module /usr/lib/modules/"
+cp -rf ${home}/lib/modules/$module /usr/lib/modules/
 sleep 1
 echo "cd ${home}/boot/"
 cd ${home}/boot/
@@ -45,11 +45,15 @@ system=$(ls ${home}/boot/System*)
 config=$(ls ${home}/boot/config*)
 echo "installkernel $module $vmlinuz $system /boot"
 installkernel $module $vmlinuz $system /boot
-echo "cp $config /lib/kernel/"
-cp $config /lib/kernel/
+echo "cp -rf $config /lib/kernel/"
+cp -rf $config /lib/kernel/
 
 node=$(fdisk -l  | grep EFI | tail -n 1 | cut -d ' ' -f 1)
 loader="/mnt/loader/loader.conf"
+
+echo "umount -f /mnt"
+umount -f /mnt
+sleep 1
 
 echo "mount $node /mnt"
 mount $node /mnt
