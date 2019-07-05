@@ -56,6 +56,7 @@ def set_ini_bios(ini_path):
     cli.CvProgKnobs()
 
 def get_delta_ini(full_ini):
+    current_ini = 'current.ini'
     if os.path.exists(full_ini):
         print 'full_ini: ' + full_ini
     else:
@@ -69,7 +70,6 @@ def main(argv):
     get_type = ''
     bios_set_items = ''
     ini_file = ''
-    current_ini = 'current.ini'
     try:
         opts, args = getopt.getopt(argv, "hg:s:d:i:c:e:f:", ["get_type=","bios_set_items=","bios_set_items="])
 
