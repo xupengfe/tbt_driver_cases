@@ -5,7 +5,8 @@ XML_PATH = os.path.dirname(os.path.realpath(__file__))
 #XML_PATH = '/root/bios_xml/'
 XML_FILE = XML_PATH + '/target.xml'
 INI_PATH = XML_PATH + '/out/TmpBiosKnobs.ini'
-DELTA_INI = XML_PATH + 'delta.ini'
+DELTA_INI = '/root/delta.ini'
+FULL_INI = '/root/bios_full.ini'
 
 def set_default_bios():
     sys.path.append(r"%s"%(XML_PATH))
@@ -71,7 +72,7 @@ def main(argv):
     ini_file = ''
     current_ini = 'current.ini'
     try:
-        opts, args = getopt.getopt(argv, "hg:s:d:i:f:", ["get_type=","bios_set_items=","bios_set_items="])
+        opts, args = getopt.getopt(argv, "hg:s:d:i:c:e:f:", ["get_type=","bios_set_items=","bios_set_items="])
 
     except getopt.GetoptError:
         print 'Error: requestTest.py -g "default|current" | -s "SecurityMode=0x00, TBTHotSMI=0x00" | -d "SecurityMode=0x00, TBTHotSMI=0x00"'
@@ -79,7 +80,7 @@ def main(argv):
 
     for opt, arg in opts:
         if opt == "-h":
-            print sys.argv[0] + ' -g "default|current"| -s "SecurityMode=0x00, TBTHotSMI=0x00"| -d "SecurityMode=0x00, TBTHotSMI=0x00"| -i bios.ini| -c full.ini| -e full.ini'
+            print sys.argv[0] + ' -g "default|current"| -s "SecurityMode=0x00, TBTHotSMI=0x00"| -d "SecurityMode=0x00, TBTHotSMI=0x00"| -i bios.ini| -c full.ini| -e full.ini| -f XML_FILE to get full ini'
             print 'For example:'
             print 'python2.7 bios_set.py -d "DiscreteTbtSupport=0x1,TbtBootOn=0x2,TBTHotSMI=0x0,Gpio5Filter=0x0,TBTHotNotify=0x0,DTbtController_0=0x1,TBTSetClkReq=0x1,TbtLtr=0x1,DTbthostRouterPortNumber_0=0x2,DTbtPcieExtraBusRsvd_0=0x6A,DTbtPcieMemRsvd_0=0x6A,DTbtPcieMemRsvd_0=0x2E1,DTbtPciePMemRsvd_0=0x4A0,Win10Support=0x2,TrOsup=0x1,TbtL1SubStates=0x0,Rtd3Tbt=0x1,TbtVtdBaseSecurity=0x1,EnableSgx=0x1,PrmrrSize=0x8000000,EnableAbove4GBMmio=0x1,PrimaryDisplay_inst_3=0x0,PcieRootPortAspm_20=0x2,PcieRootPortHPE_20=0x1,PcieRootPortDptp_20=0x5,PcieSwEqOverride=0x1"'
             print 'bios_xml folder path: ' + XML_PATH
@@ -125,6 +126,9 @@ def main(argv):
             get_delta_ini(full_ini_name)
             set_ini_bios(DELTA_INI)
             get_xml()
+        elif opt in ("-f", "--fId"):
+            xml_file = arg
+            os.system('../generate_ini.sh -f %s -o %s'%(xml_file,FULL_INI))
         else:
             print 'parm not correct, please -h to check'
             sys.exit()
