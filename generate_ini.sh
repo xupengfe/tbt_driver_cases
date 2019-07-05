@@ -39,12 +39,15 @@ compare_ini() {
   target_name=""
   target_value=""
   result_name=""
+  warn_file="warn.txt"
 
   [[ -n "$GEN_FILE" ]] || {
     echo "No -o setting, set bios.ini as default output ini file"
     GEN_FILE="bios.ini"
   }
+
   cat /dev/null > $GEN_FILE
+  cat /dev/null > $warn_file
 
   target_items=$(cat $TARGET_INI)
   for item in $target_items; do
@@ -56,21 +59,23 @@ compare_ini() {
 
     target_name=$(echo $item | cut -d '=' -f 1)
     target_value=$(echo $item | cut -d '=' -f 2)
-    result_name=$(cat $CURRENT_INI | grep $target_name)
+    result_name=$(cat $CURRENT_INI | grep "^${target_name}=")
 
     [[ -n "$result_name" ]] || {
       echo "item $target_name find in target $TARGET_INI but no in $CURRENT_INI"
+      echo "item $target_name find in target $TARGET_INI but no in $CURRENT_INI" >> $warn_file
       continue
     }
-    result_value=$(cat $CURRENT_INI | grep $target_name | grep $target_value)
+    result_value=$(cat $CURRENT_INI | grep "^${target_name}=" | grep $target_value)
     if [[ -z "$result_value" ]]; then
-      echo "Item:$result_name will change to $target_value"
+      echo "Item |$result_name| -> |$item|"
     else
       continue
     fi
     echo $item >> $GEN_FILE
-
   done
+  echo "$warn_file"
+  echo "$GEN_FILE"
 }
 
 
@@ -109,17 +114,17 @@ do
         compare_ini
       fi
       ;;
-     o)
-       GEN_FILE=$OPTARG
-       ;;
-     h)
-       usage
-       exit 2
-       ;;
-     :)
-       usage
-       exit 2
-       ;;
+    o)
+      GEN_FILE=$OPTARG
+      ;;
+    h)
+      usage
+      exit 2
+      ;;
+    :)
+      usage
+      exit 2
+      ;;
   esac
 done
 
