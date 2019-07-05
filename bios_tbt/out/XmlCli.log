@@ -1,0 +1,106 @@
+****  Using "winsdk" mode as Interface  ****
+CLI Spec Version = 0.7.1
+XmlCli support is Enabled..
+CLI Spec Version = 0.7.1
+Compressed XML is not supported, Downloading Regular XML
+Host XML didn't exist or is different from Target XML, downloading Target XML..
+Saved XML Data as c:\alex.xml
+CLI Spec Version = 0.7.1
+Compressed XML is not supported, Downloading Regular XML
+Host XML didn't exist or is different from Target XML, downloading Target XML..
+Saved XML Data as C:\XmlClinew\out\PlatformConfig.xml
+CLI Request Buffer Addr = 0x8C0F4000   CLI Response Buffer Addr = 0x8C1F4200
+Req Buffer Bin file used is C:\XmlClinew\out\biosKnobsdata.bin
+CLI Mailbox programmed, issuing S/W SMI to program knobs...
+CLI Response Header:
+   CmdID = 0x48 ("APPEND_BIOS_KNOBS_CMD_ID") 
+   Status = 0x0;  ParamSize = 0xC;  Flags.WrongParam = 0;
+   Flags.CantExe = 0;  Flags.SideEffects = "PowerGoodResetRequired"; 
+CLI command executed successfully..
+BIOS knobs CLI Command ended successfully
+, see below for the results..
+|--|----|------------------------------------------|--|-----------|-----------|
+|VI|Ofst|                 Knob Name                |Sz|   DefVal  |   CurVal  |
+|--|----|------------------------------------------|--|-----------|-----------|
+| 4|  1B|                              StateAfterG3| 1|        0  |        1  |
+|--|----|------------------------------------------|--|-----------|-----------|
+Verify Passed!
+CLI Spec Version = 0.7.1
+Compressed XML is not supported, Downloading Regular XML
+File Exists:  comparing target & host XML header
+Host XML didn't exist or is different from Target XML, downloading Target XML..
+Saved XML Data as C:\XmlClinew\out\PlatformConfig.xml
+CLI Request Buffer Addr = 0x8C0F4000   CLI Response Buffer Addr = 0x8C1F4200
+Req Buffer Bin file used is C:\XmlClinew\out\biosKnobsdata.bin
+CLI Mailbox programmed, issuing S/W SMI to program knobs...
+CLI Response Header:
+   CmdID = 0x48 ("APPEND_BIOS_KNOBS_CMD_ID") 
+   Status = 0x0;  ParamSize = 0xC;  Flags.WrongParam = 0;
+   Flags.CantExe = 0;  Flags.SideEffects = "PowerGoodResetRequired"; 
+CLI command executed successfully..
+BIOS knobs CLI Command ended successfully
+, see below for the results..
+|--|----|------------------------------------------|--|-----------|-----------|
+|VI|Ofst|                 Knob Name                |Sz|   DefVal  |   CurVal  |
+|--|----|------------------------------------------|--|-----------|-----------|
+| 4|  1B|                              StateAfterG3| 1|        0  |        0  |
+|--|----|------------------------------------------|--|-----------|-----------|
+Verify Passed!
+****  Using "linux" mode as Interface  ****
+CLI Spec Version = 0.6.0
+XmlCli support is Enabled..
+CLI Spec Version = 0.6.0
+Compressed XML is not supported, Downloading Regular XML
+Host XML didn't exist or is different from Target XML, downloading Target XML..
+Saved XML Data as /root/jerry/test.xml
+CLI Spec Version = 0.6.0
+Compressed XML is not supported, Downloading Regular XML
+File Exists:  comparing target & host XML header
+Host XML didn't exist or is different from Target XML, downloading Target XML..
+Saved XML Data as /root/jerry/xmlcliNEW/out/PlatformConfig.xml
+CLI Request Buffer Addr = 0x64444000   CLI Response Buffer Addr = 0x64544200
+Request buffer is Empty, No Action required, Aborting...
+CLI Spec Version = 0.6.0
+Compressed XML is not supported, Downloading Regular XML
+File Exists:  comparing target & host XML header
+Host XML didn't exist or is different from Target XML, downloading Target XML..
+Saved XML Data as /root/jerry/xmlcliNEW/out/PlatformConfig.xml
+CLI Request Buffer Addr = 0x64444000   CLI Response Buffer Addr = 0x64544200
+Req Buffer Bin file used is /root/jerry/xmlcliNEW/out/biosKnobsdata.bin
+CLI Mailbox programmed, issuing S/W SMI to program knobs...
+CLI Response not yet ready, retrying..
+CLI Response not yet ready, retrying..
+CLI Response not yet ready, retrying..
+CLI Response not yet ready, retrying..
+CLI Response not yet ready, retrying..
+CLI Response not ready even after retries, exiting..
+CLI Response not ready, Aborting....
+****  Using "linux" mode as Interface  ****
+CLI Spec Version = 0.6.0
+XmlCli support is Enabled..
+CLI Spec Version = 0.6.0
+Compressed XML is not supported, Downloading Regular XML
+Host XML didn't exist or is different from Target XML, downloading Target XML..
+Saved XML Data as /root/localbios.xml
+CLI Spec Version = 0.6.0
+Compressed XML is not supported, Downloading Regular XML
+File Exists:  comparing target & host XML header
+Host XML didn't exist or is different from Target XML, downloading Target XML..
+Saved XML Data as /root/jerry/xmlcli/out/PlatformConfig.xml
+CLI Request Buffer Addr = 0x64444000   CLI Response Buffer Addr = 0x64544200
+Req Buffer Bin file used is /root/jerry/xmlcli/out/biosKnobsdata.bin
+CLI Mailbox programmed, issuing S/W SMI to program knobs...
+CLI Response not yet ready, retrying..
+CLI Response not yet ready, retrying..
+CLI Response not yet ready, retrying..
+CLI Response not yet ready, retrying..
+CLI Response not yet ready, retrying..
+CLI Response not ready even after retries, exiting..
+CLI Response not ready, Aborting....
+****  Using "linux" mode as Interface  ****
+CLI Spec Version = 0.6.0
+XmlCli support is Enabled..
+****  Using "linux" mode as Interface  ****
+SanitizeXml(): Fixing XML syntax errors found with source XML file.
+****  Using "linux" mode as Interface  ****
+SanitizeXml(): Fixing XML syntax errors found with source XML file.
