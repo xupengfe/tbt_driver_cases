@@ -55,8 +55,7 @@ def set_ini_bios(ini_path):
     cli.clb.KnobsIniFile=r"%s"%(ini_path)
     cli.CvProgKnobs()
 
-def get_delta_ini(full_ini_name):
-    get_delta_ini(full_ini_name)
+def get_delta_ini(full_ini):
     if os.path.exists(full_ini):
         print 'full_ini: ' + full_ini
     else:
