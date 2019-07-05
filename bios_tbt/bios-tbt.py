@@ -116,7 +116,6 @@ def main(argv):
             get_xml()
             os.system('../generate_ini.sh -f %s -o %s'%(XML_FILE) %(current_ini))
             os.system('../generate_ini.sh -c %s -t %s -o %s'%(current_ini) %(full_ini) %(DELTA_INI))
-            print DELTA_INI
         else:
             print 'parm not correct, please -h to check'
             sys.exit()
