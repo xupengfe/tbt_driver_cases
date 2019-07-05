@@ -110,8 +110,6 @@ do
         echo "No current ini:$CURRENT_INI"
         usage
         exit 2
-      else
-        compare_ini
       fi
       ;;
     o)
@@ -129,3 +127,4 @@ do
 done
 
 [[ -z "$SOUREC_FILE" ]] && [[ -z "$CURRENT_INI" ]] && usage
+[[ -n "$CURRENT_INI" ]] && [[ -n "$TARGET_INI" ]] && compare_ini
