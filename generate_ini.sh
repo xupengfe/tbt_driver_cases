@@ -89,7 +89,6 @@ do
         usage
         exit 2
       }
-      generate_ini
       ;;
     c)
       CURRENT_INI=$OPTARG
@@ -128,3 +127,4 @@ done
 
 [[ -z "$SOUREC_FILE" ]] && [[ -z "$CURRENT_INI" ]] && usage
 [[ -n "$CURRENT_INI" ]] && [[ -n "$TARGET_INI" ]] && compare_ini
+[[ -z "$SOUREC_FILE" ]] || generate_ini
