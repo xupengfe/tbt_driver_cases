@@ -1,4 +1,8 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-2.0
+
+# Generate full bios items ini or compare 2 ini to get differences ini
+# Pengfei, Xu  <pengfei.xu@intel.com>
 
 SOUREC_FILE=""
 GEN_FILE=""
@@ -10,6 +14,7 @@ usage() {
     -f XML_FILE: will generate full bios item ini
     -c CURRENT_INI -t TARGET_INI: will compare both and generate delta target ini
 __EOF
+  exit 2
 }
 
 generate_ini() {
@@ -87,7 +92,6 @@ do
       [[ -e "$SOUREC_FILE" ]] || {
         echo "No origin file:$SOUREC_FILE exist"
         usage
-        exit 2
       }
       ;;
     c)
@@ -95,7 +99,6 @@ do
       [[ -e "$CURRENT_INI" ]] || {
         echo "No current ini file:$CURRENT_INI exist"
         usage
-        exit 2
       }
       ;;
     t)
@@ -103,12 +106,10 @@ do
       [[ -e "$TARGET_INI" ]] || {
         echo "No target ini file:$TARGET_INI exist"
         usage
-        exit 2
       }
       if [[ -z "$CURRENT_INI" ]]; then
         echo "No current ini:$CURRENT_INI"
         usage
-        exit 2
       fi
       ;;
     o)
@@ -116,11 +117,9 @@ do
       ;;
     h)
       usage
-      exit 2
       ;;
     :)
       usage
-      exit 2
       ;;
   esac
 done
