@@ -10,9 +10,10 @@ NAMES=""
 
 usage() {
   cat <<__EOF
-  usage: ./${0##*/} [-f XML_FILE][-c CURRENT_INI][-t TARGET_INI]
+  usage: ./${0##*/} [-f XML_FILE][-c CURRENT_INI][-t TARGET_INI][-o output.ini]
     -f XML_FILE: will generate full bios item ini
     -c CURRENT_INI -t TARGET_INI: will compare both and generate delta target ini
+    -o output.ini, if no -o item will set bios.ini as default
 __EOF
   exit 2
 }
