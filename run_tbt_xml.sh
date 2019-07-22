@@ -20,6 +20,7 @@ usage() {
   usage: ./${0##*/} platform_rvp FUNC
     platform_rvp: example cfl-h-rvp | whl-u-rvp | cml-u-rvp | aml-y-rvp | icl-u-rvp
     FUNC: optional example none|user|secure|dp or rerun | clear
+          optional example set_none|set_user|set_secure_set_dp for only set bios
 __EOF
 }
 
