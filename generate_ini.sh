@@ -29,6 +29,7 @@ generate_ini() {
   }
 
   cat /dev/null > $GEN_FILE
+  echo "[BiosKnobs]" >> $GEN_FILE
   for name in ${NAMES}; do
     value=""
     value=$(cat "$SOUREC_FILE" | grep "name=\"$name\"" | awk -F "CurrentVal=" '{print $2}' | awk -F '\"' '{print $2}' | tail -n 1)
@@ -54,6 +55,7 @@ compare_ini() {
 
   cat /dev/null > $GEN_FILE
   cat /dev/null > $warn_file
+  echo "[BiosKnobs]" >> $GEN_FILE
 
   target_items=$(cat $TARGET_INI)
   for item in $target_items; do
