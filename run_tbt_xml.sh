@@ -20,7 +20,7 @@ usage() {
   usage: ./${0##*/} platform_rvp FUNC
     platform_rvp: example cfl-h-rvp | whl-u-rvp | cml-u-rvp | aml-y-rvp | icl-u-rvp
     FUNC: optional example none|user|secure|dp or rerun | clear
-          optional example set_none|set_user|set_secure_set_dp for only set bios
+          optional example set_none|set_user|set_secure|set_dp for only set bios
 __EOF
 }
 
@@ -100,8 +100,8 @@ test_tbt() {
     none|user|secure|dp)
       rm -rf $all_set_txt
       echo "$(date +%m-%d_%H_%M): FUNC:$FUNC, set_${FUNC}.ini and ${ONLY_MODE} in $BIOS_DATA" >> $RUN_TBT_FILE
-      echo "$(date +%m-%d_%H_%M): bios-set.py -i ${BIOS_DATA}/set_${FUNC}.ini" >> $RUN_TBT_FILE
-      bios-set.py -i ${BIOS_DATA}/set_${FUNC}.ini
+      echo "$(date +%m-%d_%H_%M): bios-tbt.py -i ${BIOS_DATA}/set_${FUNC}.ini" >> $RUN_TBT_FILE
+      bios-tbt.py -i ${BIOS_DATA}/set_${FUNC}.ini
       echo "$(date +%m-%d_%H_%M): Create file ${BIOS_DATA}/${ONLY_MODE}" >> $RUN_TBT_FILE
       echo "only" > ${BIOS_DATA}/${ONLY_MODE}
       reboot
@@ -109,7 +109,7 @@ test_tbt() {
     set_none|set_user|set_secure|set_dp)
       rm -rf $all_set_txt
       echo "$(date +%m-%d_%H_%M): FUNC:$FUNC, set_${FUNC}.ini and ${ONLY_SET} in $BIOS_DATA" >> $RUN_TBT_FILE
-      bios-set.py -i ${BIOS_DATA}/${FUNC}.ini
+      bios-tbt.py -i ${BIOS_DATA}/${FUNC}.ini
       echo "$(date +%m-%d_%H_%M): Create file ${BIOS_DATA}/${ONLY_SET}" >> $RUN_TBT_FILE
       echo "only" > ${BIOS_DATA}/${ONLY_SET}
       reboot

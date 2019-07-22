@@ -105,8 +105,8 @@ test_tbt() {
       else
         echo "$(date +%m-%d_%H_%M): delete *set*.txt, set user mode bios" >> $RUN_TBT_FILE
         rm -rf $all_set_txt
-	echo "$(date +%m-%d_%H_%M): boot_tbt_xml: bios-set.py -i ${BIOS_DATA}/set_user.ini" >> $RUN_TBT_FILE
-        bios-set.py -i ${BIOS_DATA}/set_user.ini
+	echo "$(date +%m-%d_%H_%M): boot_tbt_xml: bios-tbt.py -i ${BIOS_DATA}/set_user.ini" >> $RUN_TBT_FILE
+        bios-tbt.py -i ${BIOS_DATA}/set_user.ini
 	echo "next" > ${BIOS_DATA}/user_set_done.txt
 	sleep 1
         reboot
@@ -129,8 +129,8 @@ test_tbt() {
       else
         echo "$(date +%m-%d_%H_%M): delete *set*.txt, set secure mode bios" >> $RUN_TBT_FILE
         rm -rf $all_set_txt
-	echo "$(date +%m-%d_%H_%M): boot_tbt_xml: bios-set.py -i ${BIOS_DATA}/set_secure.ini" >> $RUN_TBT_FILE
-	bios-set.py -i ${BIOS_DATA}/set_secure.ini
+	echo "$(date +%m-%d_%H_%M): boot_tbt_xml: bios-tbt.py -i ${BIOS_DATA}/set_secure.ini" >> $RUN_TBT_FILE
+	bios-tbt.py -i ${BIOS_DATA}/set_secure.ini
 	echo "next" > ${BIOS_DATA}/secure_set_done.txt
         reboot
       fi
@@ -160,8 +160,8 @@ test_tbt() {
       else
         echo "$(date +%m-%d_%H_%M): delete *set*.txt, set dp mode bios" >> $RUN_TBT_FILE
         rm -rf $all_set_txt
-	echo "$(date +%m-%d_%H_%M): boot_tbt_xml: bios-set.py -i ${BIOS_DATA}/set_dp.ini" >> $RUN_TBT_FILE
-	bios-set.py -i ${BIOS_DATA}/set_dp.ini
+	echo "$(date +%m-%d_%H_%M): boot_tbt_xml: bios-tbt.py -i ${BIOS_DATA}/set_dp.ini" >> $RUN_TBT_FILE
+	bios-tbt.py -i ${BIOS_DATA}/set_dp.ini
 	echo "next" > ${BIOS_DATA}/dp_set_done.txt
         reboot
       fi
