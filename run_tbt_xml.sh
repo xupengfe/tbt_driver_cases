@@ -73,10 +73,17 @@ test_tbt() {
   tbt_done_file=""
   ddt_path=$(ls -1 /home/* | grep ^/home | grep "ltp-ddt_" | tail -n 1 | cut -d ':' -f 1)
   all_set_txt="${BIOS_DATA}/*set*.txt"
-  origin_date=$(cat $DATE_FILE)
+  origin_date=""
   tbt_common=""
   tbt_log_file=""
   present_date=$(date +%m-%d_%H_%M)
+
+
+  [[ -e "$DATE_FILE" ]] || {
+    echo "There was no  $DATE_FILE, created it with $DATE"
+    echo "$DATE" > $DATE_FILE
+  }
+  origin_date=$(cat $DATE_FILE) 
 
   if [[ -z "$origin_date" ]]; then
     TBT_LOG="/opt/logs/TBT_${LINUX_VER}_${DATE}"
@@ -89,12 +96,6 @@ test_tbt() {
     mkdir -p $LOG_PATH
   }
 
-  cd $BIOS_DATA
-  tbt_done_file=$(ls -1 *set_done.txt)
-  echo >> $RUN_TBT_FILE
-  echo "**********************************" >> $RUN_TBT_FILE
-  echo "$DATE, ddt path:$ddt_path, $tbt_done_file" >> $RUN_TBT_FILE
-
 
   case ${FUNC} in
     none|user|secure|dp)
@@ -103,6 +104,7 @@ test_tbt() {
       echo "$(date +%m-%d_%H_%M): bios-tbt.py -i ${BIOS_DATA}/set_${FUNC}.ini" >> $RUN_TBT_FILE
       bios-tbt.py -i ${BIOS_DATA}/set_${FUNC}.ini
       echo "$(date +%m-%d_%H_%M): Create file ${BIOS_DATA}/${ONLY_MODE}" >> $RUN_TBT_FILE
+      echo "next" > ${BIOS_DATA}/${FUNC}_set_done.txt
       echo "only" > ${BIOS_DATA}/${ONLY_MODE}
       reboot
       ;;
