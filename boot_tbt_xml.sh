@@ -73,6 +73,12 @@ test_tbt() {
     mkdir -p $LOG_PATH
   }
 
+  [[ -e "$BIOS_DATA/$ONLY_SET" ]] && {
+    echo "$DATE, $BIOS_DATA/$ONLY_SET exist, rm $BIOS_DATA/$all_set_txt" >> $RUN_TBT_FILE
+    rm -rf $BIOS_DATA/$all_set_txt
+    exit 0
+  }
+
   [[ -z "$PF" ]] && PF="cfl-h-rvp"
   cd $BIOS_DATA
   tbt_done_file=$(ls -1 *set_done.txt)
@@ -92,14 +98,17 @@ test_tbt() {
       dmesg > "${TBT_LOG}/dmesg_none_${present_date}.txt"
       echo "record dmesg:${TBT_LOG}/dmesg_none_${present_date}.txt"
 
-      if [[ -e "${BIOS_DATA}/${ONLY_FILE}" ]]; then
-        echo "$(date +%m-%d_%H_%M): contain ${ONLY_FILE}, delete *set*.txt" >> $RUN_TBT_FILE
+      if [[ -e "${BIOS_DATA}/${ONLY_MODE}" ]]; then
+        echo "$(date +%m-%d_%H_%M): contain ${ONLY_MODE}, delete *set*.txt" >> $RUN_TBT_FILE
         rm -rf $all_set_txt
         exit 0
       else
-        echo "$(date +%m-%d_%H_%M): delete *set*.txt, set user_set.txt in $BIOS_DATA" >> $RUN_TBT_FILE
+        echo "$(date +%m-%d_%H_%M): delete *set*.txt, set user mode bios" >> $RUN_TBT_FILE
         rm -rf $all_set_txt
-        echo "next" > $BIOS_DATA/user_set.txt
+	echo "$(date +%m-%d_%H_%M): boot_tbt_xml: bios-set.py -i ${BIOS_DATA}/set_user.ini" >> $RUN_TBT_FILE
+        bios-set.py -i ${BIOS_DATA}/set_user.ini
+	echo "next" > ${BIOS_DATA}/user_set_done.txt
+	sleep 1
         reboot
       fi
       echo "$(ls $BIOS_DATA)" >> $RUN_TBT_FILE
@@ -113,14 +122,16 @@ test_tbt() {
       dmesg > "${TBT_LOG}/dmesg_user_${present_date}.txt"
       echo "record dmesg:${TBT_LOG}/dmesg_user_${present_date}.txt"
 
-      if [[ -e "${BIOS_DATA}/${ONLY_FILE}" ]]; then
-        echo "$(date +%m-%d_%H_%M): contain ${ONLY_FILE}, delete *set*.txt" >> $RUN_TBT_FILE
+      if [[ -e "${BIOS_DATA}/${ONLY_MODE}" ]]; then
+        echo "$(date +%m-%d_%H_%M): contain ${ONLY_MODE}, delete *set*.txt" >> $RUN_TBT_FILE
         rm -rf $all_set_txt
         exit 0
       else
-        echo "$(date +%m-%d_%H_%M): delete *set*.txt, set secure_set.txt in $BIOS_DATA" >> $RUN_TBT_FILE
+        echo "$(date +%m-%d_%H_%M): delete *set*.txt, set secure mode bios" >> $RUN_TBT_FILE
         rm -rf $all_set_txt
-        echo "next" > $BIOS_DATA/secure_set.txt
+	echo "$(date +%m-%d_%H_%M): boot_tbt_xml: bios-set.py -i ${BIOS_DATA}/set_secure.ini" >> $RUN_TBT_FILE
+	bios-set.py -i ${BIOS_DATA}/set_secure.ini
+	echo "next" > ${BIOS_DATA}/secure_set_done.txt
         reboot
       fi
       ;;
@@ -142,14 +153,16 @@ test_tbt() {
       dmesg > "${TBT_LOG}/dmesg_secure_${present_date}.txt"
       echo "record dmesg:${TBT_LOG}/dmesg_secure_${present_date}.txt"
 
-      if [[ -e "${BIOS_DATA}/${ONLY_FILE}" ]]; then
-        echo "$(date +%m-%d_%H_%M): contain ${ONLY_FILE}, delete *set*.txt" >> $RUN_TBT_FILE
+      if [[ -e "${BIOS_DATA}/${ONLY_MODE}" ]]; then
+        echo "$(date +%m-%d_%H_%M): contain ${ONLY_MODE}, delete *set*.txt" >> $RUN_TBT_FILE
         rm -rf $all_set_txt
         exit 0
       else
-        echo "$(date +%m-%d_%H_%M): delete *set*.txt, set dp_set.txt in $BIOS_DATA" >> $RUN_TBT_FILE
+        echo "$(date +%m-%d_%H_%M): delete *set*.txt, set dp mode bios" >> $RUN_TBT_FILE
         rm -rf $all_set_txt
-        echo "next" > $BIOS_DATA/dp_set.txt
+	echo "$(date +%m-%d_%H_%M): boot_tbt_xml: bios-set.py -i ${BIOS_DATA}/set_dp.ini" >> $RUN_TBT_FILE
+	bios-set.py -i ${BIOS_DATA}/set_dp.ini
+	echo "next" > ${BIOS_DATA}/dp_set_done.txt
         reboot
       fi
       ;;
@@ -162,8 +175,8 @@ test_tbt() {
       dmesg > "${TBT_LOG}/dmesg_dp_${present_date}.txt"
       echo "record dmesg:${TBT_LOG}/dmesg_dp_${present_date}.txt"
 
-      if [[ -e "${BIOS_DATA}/${ONLY_FILE}" ]]; then
-        echo "$(date +%m-%d_%H_%M): contain ${ONLY_FILE}, delete *set*.txt" >> $RUN_TBT_FILE
+      if [[ -e "${BIOS_DATA}/${ONLY_MODE}" ]]; then
+        echo "$(date +%m-%d_%H_%M): contain ${ONLY_MODE}, delete *set*.txt" >> $RUN_TBT_FILE
         rm -rf $all_set_txt
       else
         echo "$(date +%m-%d_%H_%M): delete *set*.txt, set all_set_done.txt in $BIOS_DATA" >> $RUN_TBT_FILE
@@ -182,6 +195,6 @@ test_tbt() {
   esac
 }
 
-find_usb
+check_tbt_folder
 find_pf
 test_tbt

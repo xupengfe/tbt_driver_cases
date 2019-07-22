@@ -100,21 +100,24 @@ test_tbt() {
     none|user|secure|dp)
       rm -rf $all_set_txt
       echo "$(date +%m-%d_%H_%M): FUNC:$FUNC, set_${FUNC}.ini and ${ONLY_MODE} in $BIOS_DATA" >> $RUN_TBT_FILE
-      echo "next" > ${BIOS_DATA}/${FUNC}_set.txt
+      echo "$(date +%m-%d_%H_%M): bios-set.py -i ${BIOS_DATA}/set_${FUNC}.ini" >> $RUN_TBT_FILE
+      bios-set.py -i ${BIOS_DATA}/set_${FUNC}.ini
+      echo "$(date +%m-%d_%H_%M): Create file ${BIOS_DATA}/${ONLY_MODE}" >> $RUN_TBT_FILE
       echo "only" > ${BIOS_DATA}/${ONLY_MODE}
       reboot
       ;;
     set_none|set_user|set_secure|set_dp)
       rm -rf $all_set_txt
       echo "$(date +%m-%d_%H_%M): FUNC:$FUNC, set_${FUNC}.ini and ${ONLY_SET} in $BIOS_DATA" >> $RUN_TBT_FILE
-      #set bios
+      bios-set.py -i ${BIOS_DATA}/${FUNC}.ini
+      echo "$(date +%m-%d_%H_%M): Create file ${BIOS_DATA}/${ONLY_SET}" >> $RUN_TBT_FILE
       echo "only" > ${BIOS_DATA}/${ONLY_SET}
       reboot
       ;;
     rerun)
       rm -rf $all_set_txt
       echo "$(date +%m-%d_%H_%M): FUNC:$FUNC, rerun! Set none_set.txt in $BIOS_DATA" >> $RUN_TBT_FILE
-      echo "next" > $BIOS_DATA/none_set_done.txt
+      echo "next" > ${BIOS_DATA}/none_set_done.txt
       echo "$DATE" > $DATE_FILE
       reboot
       ;;
