@@ -7,12 +7,15 @@
 SOUREC_FILE=""
 GEN_FILE=""
 NAMES=""
+SECURE_NAME="SecurityMode"
+BIOS_DATA="/data_tbt"
 
 usage() {
   cat <<__EOF
   usage: ./${0##*/} [-f XML_FILE][-c CURRENT_INI][-t TARGET_INI][-o output.ini]
     -f XML_FILE: will generate full bios item ini
     -c CURRENT_INI -t TARGET_INI: will compare both and generate delta target ini
+    -s TARGET_INII: will generate none/user/secure/dp ini into /data_tbt
     -o output.ini, if no -o item will set bios.ini as default
 __EOF
   exit 2
@@ -86,8 +89,39 @@ compare_ini() {
   echo "$GEN_FILE"
 }
 
+set_tbt_ini() {
+  secure_exist=""
+  secure_value=""
 
-while getopts :f:c:t:o:h arg
+  [[ -d "$BIOS_DATA" ]] || {
+    echo "$BIOS_DATA not exist, create it!"
+    rm -rf $BIOS_DATA
+    mkdir -p $BIOS_DATA
+  }
+
+  secure_exist=$(cat $TARGET_INI | grep "^${SECURE_NAME}=" | head -n 1)
+  if [[ -n "$secure_exist" ]]; then
+    secure_value=$(cat $TARGET_INI | grep "^${SECURE_NAME}=" | head -n 1 | awk -F "${SECURE_NAME}=" '{print $2}' | awk -F '\"' '{print $1}')
+    echo "cp $TARGET_INI into ${BIOS_DATA} set_none/user/secure/dp.ini "
+    cp -rf $TARGET_INI ${BIOS_DATA}/set_none.ini
+    cp -rf $TARGET_INI ${BIOS_DATA}/set_user.ini
+    cp -rf $TARGET_INI ${BIOS_DATA}/set_secure.ini
+    cp -rf $TARGET_INI ${BIOS_DATA}/set_dp.ini
+    echo "sed -i s/${SECURE_NAME}=${secure_value}/${SECURE_NAME}=0x00/g $BIOS_DATA/set_none.ini"
+    sed -i s/${SECURE_NAME}=${secure_value}/${SECURE_NAME}=0x00/g $BIOS_DATA/set_none.ini
+    sed -i s/${SECURE_NAME}=${secure_value}/${SECURE_NAME}=0x01/g $BIOS_DATA/set_user.ini
+    sed -i s/${SECURE_NAME}=${secure_value}/${SECURE_NAME}=0x02/g $BIOS_DATA/set_secure.ini
+    sed -i s/${SECURE_NAME}=${secure_value}/${SECURE_NAME}=0x03/g $BIOS_DATA/set_dp.ini
+  else
+    echo "No $SECURE_NAME in $TARGET_INI file! Create $SECURE_NAME=0x00/1/2/3!"
+    echo "${SECURE_NAME}=0x00" >> $BIOS_DATA/set_none.ini
+    echo "${SECURE_NAME}=0x01" >> $BIOS_DATA/set_user.ini
+    echo "${SECURE_NAME}=0x02" >> $BIOS_DATA/set_secure.ini
+    echo "${SECURE_NAME}=0x03" >> $BIOS_DATA/set_dp.ini
+  fi
+}
+
+while getopts :f:c:t:o:s:h arg
 do
   case $arg in
     f)
@@ -115,6 +149,14 @@ do
         usage
       fi
       ;;
+    s)
+      TARGET_INI=$OPTARG
+      [[ -e "$TARGET_INI" ]] || {
+        echo "No target ini file:$TARGET_INI exist"
+        usage
+      }
+      set_tbt_ini
+      ;;
     o)
       GEN_FILE=$OPTARG
       ;;
@@ -127,6 +169,5 @@ do
   esac
 done
 
-[[ -z "$SOUREC_FILE" ]] && [[ -z "$CURRENT_INI" ]] && usage
 [[ -n "$CURRENT_INI" ]] && [[ -n "$TARGET_INI" ]] && compare_ini
 [[ -z "$SOUREC_FILE" ]] || generate_ini
