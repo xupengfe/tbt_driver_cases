@@ -1,5 +1,18 @@
 ln -s /root/tbt_driver_cases/bios_tbt/bios-tbt.py /usr/bin/bios-tbt.py
 
+./setup.sh    // set up the environment
+
+// after tbt bios setting was ready, execute it
+bios-tbt.py -a
+
+./run_tbt_xml.sh cfl-h-rvp set_none/user/secure/dp  // set tbt bios mode
+
+./run_tbt_xml.sh cfl-h-rvp none/user/secure/dp  // set and run matched mode
+
+./run_tbt_xml.sh rerun  //  set and run all 4 modes
+
+./run_tbt_xml.sh clear // clear as before action for new  cycle tests
+
 
 
 python2.7
