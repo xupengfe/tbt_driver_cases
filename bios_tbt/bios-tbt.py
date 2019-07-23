@@ -131,8 +131,8 @@ def main(argv):
         elif opt == "-a":
             get_xml()
             print 'generate full ini into FULL_INI'
-            os.system('../generate_ini.sh -f %s -o %s'%(XML_FILE,FULL_INI))
-            os.system('../generate_ini.sh -s %s'%(FULL_INI))
+            os.system('%s/../generate_ini.sh -f %s -o %s'%(XML_PATH,XML_FILE,FULL_INI))
+            os.system('%s/../generate_ini.sh -s %s'%(XML_PATH,FULL_INI))
             print 'generate full ini into ' + FULL_INI + ' done'
         else:
             print 'parm not correct, please -h to check'
