@@ -13,7 +13,7 @@ ln -s ${tbt_bios}/bios-tbt.py /usr/bin/bios-tbt.py
 
 echo "[Service]" > $tbt_service
 echo "Type=simple" >> $tbt_service
-echo "ExecStart=/root/tbt_driver_cases/boot_tbt_xml.sh" >> $tbt_service
+echo "ExecStart=${tbt_bios}/../boot_tbt_xml.sh" >> $tbt_service
 echo "[Install]" >> $tbt_service
 echo "WantedBy=multi-user.target graphical.target" >> $tbt_service
 
