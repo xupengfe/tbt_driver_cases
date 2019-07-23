@@ -81,7 +81,7 @@ test_tbt() {
 
   [[ -z "$PF" ]] && PF="cfl-h-rvp"
   cd $BIOS_DATA
-  tbt_done_file=$(ls -1 *set_done.txt)
+  tbt_done_file=$(ls -1 *set_done.txt 2>/dev/null)
   echo >> $RUN_TBT_FILE
   echo "**********************************" >> $RUN_TBT_FILE
   echo "$DATE, ddt path:$ddt_path" >> $RUN_TBT_FILE

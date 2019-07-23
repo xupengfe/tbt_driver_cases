@@ -1,15 +1,15 @@
 #!/bin/bash
 
-tbt_bios="/root/tbt_driver_cases/bios_tbt/"
+tbt_bios=$(pwd)
 tbt_service="/etc/systemd/system/tbtxml.service"
 
-
+echo "tbt_bios:$tbt_bios"
 [[ -d "$tbt_bios" ]] || {
   echo "No $tbt_bios folder, please in /root and use root user: git clone https://github.com/xupengfe/tbt_driver_cases.git"
   exit 1
 }
 
-ln -s /root/tbt_driver_cases/bios_tbt/bios-tbt.py /usr/bin/bios-tbt.py
+ln -s ${tbt_bios}/bios-tbt.py /usr/bin/bios-tbt.py
 
 echo "[Service]" > $tbt_service
 echo "Type=simple" >> $tbt_service
