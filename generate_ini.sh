@@ -15,7 +15,7 @@ usage() {
   usage: ./${0##*/} [-f XML_FILE][-c CURRENT_INI][-t TARGET_INI][-o output.ini]
     -f XML_FILE: will generate full bios item ini
     -c CURRENT_INI -t TARGET_INI: will compare both and generate delta target ini
-    -s TARGET_INII: will generate none/user/secure/dp ini into /data_tbt
+    -s TARGET_INI: will generate none/user/secure/dp ini into /data_tbt
     -o output.ini, if no -o item will set bios.ini as default
 __EOF
   exit 2
