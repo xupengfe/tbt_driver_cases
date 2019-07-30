@@ -16,7 +16,7 @@ tbt_device_check() {
     else
       pci_device=$(lspci | grep "$pci" | awk -F "Device" '{print $2}' | cut -d ' ' -f 2)
       echo "tbt pci:$pci  device_id:$pci_device"
-      [[ -n "$pci_device" ]] || echo "pci_device id is null:$(lspci | grep "$pci")"
+      [[ -n "$pci_device" ]] || echo "tbt device id is null->$(lspci | grep "$pci")"
     fi
   done
 }
