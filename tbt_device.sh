@@ -15,7 +15,7 @@ tbt_device_check() {
       continue
     else
       pci_device=$(lspci | grep "$pci" | awk -F "Device" '{print $2}' | cut -d ' ' -f 2)
-      echo "tbt pci:$pci device:$pci_device"
+      echo "tbt pci:$pci  device_id:$pci_device"
     fi
   done
 }
