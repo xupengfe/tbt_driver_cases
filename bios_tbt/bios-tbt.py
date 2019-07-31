@@ -129,6 +129,7 @@ def main(argv):
             xml_file = arg
             os.system('../generate_ini.sh -f %s -o %s'%(xml_file,FULL_INI))
         elif opt == "-a":
+            raw_input("/bios_tbt/*.ini will be changed, ctrl+c to exit, Enter to continue")
             get_xml()
             print 'generate full ini into FULL_INI'
             os.system('%s/../generate_ini.sh -f %s -o %s'%(XML_PATH,XML_FILE,FULL_INI))

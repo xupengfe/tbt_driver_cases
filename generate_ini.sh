@@ -99,9 +99,17 @@ set_tbt_ini() {
     mkdir -p $BIOS_DATA
   }
 
+  [[ -d "${BIOS_DATA}/bak" ]] || {
+    echo "$BIOS_DATA/bak not exist, create it!"
+    mkdir -p $BIOS_DATA/bak
+  }
+
   secure_exist=$(cat $TARGET_INI | grep "^${SECURE_NAME}=" | head -n 1)
   if [[ -n "$secure_exist" ]]; then
     secure_value=$(cat $TARGET_INI | grep "^${SECURE_NAME}=" | head -n 1 | awk -F "${SECURE_NAME}=" '{print $2}' | awk -F '\"' '{print $1}')
+    echo "back up old ini files: cp -rf ${BIOS_DATA}/*.ini ${BIOS_DATA}/bak"
+    cp -rf ${BIOS_DATA}/*.ini ${BIOS_DATA}/bak
+
     echo "cp $TARGET_INI into ${BIOS_DATA} set_none/user/secure/dp.ini "
     cp -rf $TARGET_INI ${BIOS_DATA}/set_none.ini
     cp -rf $TARGET_INI ${BIOS_DATA}/set_user.ini
