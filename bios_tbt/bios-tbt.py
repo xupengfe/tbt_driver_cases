@@ -63,8 +63,8 @@ def get_delta_ini(full_ini):
         print 'full_ini: ' + full_ini + ' not exist'
         sys.exit()
     get_xml()
-    os.system('../generate_ini.sh -f %s -o %s'%(XML_FILE,current_ini))
-    os.system('../generate_ini.sh -c %s -t %s -o %s'%(current_ini,full_ini,DELTA_INI))
+    os.system('%s/../generate_ini.sh -f %s -o %s'%(XML_PATH,XML_FILE,current_ini))
+    os.system('%s/../generate_ini.sh -c %s -t %s -o %s'%(XML_PATH,current_ini,full_ini,DELTA_INI))
 
 def main(argv):
     get_type = ''
@@ -134,7 +134,7 @@ def main(argv):
             get_xml()
         elif opt in ("-f", "--fId"):
             xml_file = arg
-            os.system('../generate_ini.sh -f %s -o %s'%(xml_file,FULL_INI))
+            os.system('%s/../generate_ini.sh -f %s -o %s'%(XML_PATH,xml_file,FULL_INI))
         elif opt == "-a":
             raw_input("/bios_tbt/*.ini will be changed, ctrl+c to exit, Enter to continue")
             get_xml()
