@@ -79,9 +79,16 @@ def main(argv):
 
     for opt, arg in opts:
         if opt == "-h":
-            print sys.argv[0] + ' -g "default|current"| -s "SecurityMode=0x00, TBTHotSMI=0x00"| -d "SecurityMode=0x00, TBTHotSMI=0x00"| -i bios.ini| -c full.ini for delta| -e full.ini for delta and set| -f XML_FILE to get full ini | -a to generate XML and set tbt none/user/secure/dp.ini in /data_tbt'
+            print sys.argv[0] + ' -g "default|current" // get default or current xml'
+            print '         -s "SecurityMode=0x00, TBTHotSMI=0x00" // set bios item based on current config'
+            print '         -d "SecurityMode=0x00, TBTHotSMI=0x00" // set bios to default and then set bios items'
+            print '         -i bios.ini //set bios items in bios.ini file'
+            print '         -c full.ini for delta // show bios items with delta compared with current config'
+            print '         -e full.ini for delta and set // set bios items with delta compared with current config'
+            print '         -f XML_FILE to get full ini // transfer XML_FILE to full ini file'
+            print '         -a // set current config to XML and /root/bios_full.ini, and then generate tbt none/user/secure/dp.ini in /data_tbt'
             print 'For example:'
-            print 'python2.7 bios_set.py -d "DiscreteTbtSupport=0x1,TbtBootOn=0x2,TBTHotSMI=0x0,Gpio5Filter=0x0,TBTHotNotify=0x0,DTbtController_0=0x1,TBTSetClkReq=0x1,TbtLtr=0x1,DTbthostRouterPortNumber_0=0x2,DTbtPcieExtraBusRsvd_0=0x6A,DTbtPcieMemRsvd_0=0x6A,DTbtPcieMemRsvd_0=0x2E1,DTbtPciePMemRsvd_0=0x4A0,Win10Support=0x2,TrOsup=0x1,TbtL1SubStates=0x0,Rtd3Tbt=0x1,TbtVtdBaseSecurity=0x1,EnableSgx=0x1,PrmrrSize=0x8000000,EnableAbove4GBMmio=0x1,PrimaryDisplay_inst_3=0x0,PcieRootPortAspm_20=0x2,PcieRootPortHPE_20=0x1,PcieRootPortDptp_20=0x5,PcieSwEqOverride=0x1"'
+            print 'bios_set.py -s "DiscreteTbtSupport=0x1,TbtBootOn=0x2,TBTHotSMI=0x0,Gpio5Filter=0x0,TBTHotNotify=0x0,DTbtController_0=0x1,TBTSetClkReq=0x1,TbtLtr=0x1,DTbthostRouterPortNumber_0=0x2,DTbtPcieExtraBusRsvd_0=0x6A,DTbtPcieMemRsvd_0=0x6A,DTbtPcieMemRsvd_0=0x2E1,DTbtPciePMemRsvd_0=0x4A0,Win10Support=0x2,TrOsup=0x1,TbtL1SubStates=0x0,Rtd3Tbt=0x1,TbtVtdBaseSecurity=0x1,EnableSgx=0x1,PrmrrSize=0x8000000,EnableAbove4GBMmio=0x1,PrimaryDisplay_inst_3=0x0,PcieRootPortAspm_20=0x2,PcieRootPortHPE_20=0x1,PcieRootPortDptp_20=0x5,PcieSwEqOverride=0x1"'
             print 'bios_xml folder path: ' + XML_PATH
             sys.exit()
 
