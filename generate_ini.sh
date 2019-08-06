@@ -68,6 +68,7 @@ compare_ini() {
     result_name=""
     result_value=""
 
+    [[ "$item" == "[BiosKnobs]" ]] && continue
     target_name=$(echo $item | cut -d '=' -f 1)
     target_value=$(echo $item | cut -d '=' -f 2)
     result_name=$(cat $CURRENT_INI | grep "^${target_name}=")
