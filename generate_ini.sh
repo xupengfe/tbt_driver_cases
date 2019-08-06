@@ -50,6 +50,7 @@ compare_ini() {
   target_value=""
   result_name=""
   warn_file="warn.txt"
+  change_log="change.txt"
 
   [[ -n "$GEN_FILE" ]] || {
     echo "No -o setting, set bios.ini as default output ini file"
@@ -58,6 +59,7 @@ compare_ini() {
 
   cat /dev/null > $GEN_FILE
   cat /dev/null > $warn_file
+  cat /dev/null > $change_log
   echo "[BiosKnobs]" >> $GEN_FILE
 
   target_items=$(cat $TARGET_INI)
@@ -68,7 +70,7 @@ compare_ini() {
     result_name=""
     result_value=""
 
-    [[ "$item" == "[BiosKnobs]" ]] && continue
+    [[ "$item" == *"="* ]] || continue
     target_name=$(echo $item | cut -d '=' -f 1)
     target_value=$(echo $item | cut -d '=' -f 2)
     result_name=$(cat $CURRENT_INI | grep "^${target_name}=")
@@ -81,6 +83,7 @@ compare_ini() {
     result_value=$(cat $CURRENT_INI | grep "^${target_name}=" | grep $target_value)
     if [[ -z "$result_value" ]]; then
       echo "Item |$result_name| -> |$item|"
+      echo "Item |$result_name| -> |$item|" >> $change_log
     else
       continue
     fi
@@ -88,6 +91,7 @@ compare_ini() {
   done
   echo "$warn_file"
   echo "$GEN_FILE"
+  echo "$change_log"
 }
 
 set_tbt_ini() {
