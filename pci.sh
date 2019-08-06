@@ -79,15 +79,15 @@ find_root_pci()
 {
   local icl=$(dmidecode | grep "ICL")
 
-    if [[ -n "$icl" ]]; then
-       echo "ICL platform"
-       tbt_dev=$(ls ${TBT_PATH} \
-               | grep "$REGEX_ITEM" \
-               | grep -v "$HOST_EXCLUDE" \
-               | awk '{ print length(), $0 | "sort -n" }' \
-               | grep ^3 \
-               | cut -d ' ' -f 2 \
-               | head -n1)
+  if [[ -n "$icl" ]]; then
+     echo "ICL platform"
+     tbt_dev=$(ls ${TBT_PATH} \
+             | grep "$REGEX_ITEM" \
+             | grep -v "$HOST_EXCLUDE" \
+             | awk '{ print length(), $0 | "sort -n" }' \
+             | grep ^3 \
+             | cut -d ' ' -f 2 \
+             | head -n1)
 
      case ${tbt_dev} in
        0-1)
@@ -108,7 +108,8 @@ find_root_pci()
          ;;
      esac
   else
-    ROOT_PCI="0000:03:00.0"
+    ROOT_PCI=$(udevadm info --attribute-walk --path=/sys/bus/thunderbolt/devices/0-0 | grep KERNEL | tail -n 2 | grep -v pci0000 | cut -d "\"" -f 2)
+    #ROOT_PCI="0000:03:00.0"
   fi
 }
 
