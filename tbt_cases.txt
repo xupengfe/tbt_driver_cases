@@ -403,6 +403,8 @@ Command sample:"./runtests.sh -p cfl-s_cnl-h -P cfl-s_cnl-h -f ddt_intel/tbt_use
 
 Part 11 - TBT secure mode tests:
 Command sample:"./runtests.sh -p cfl-s_cnl-h -P cfl-s_cnl-h -f ddt_intel/tbt_secure_tests -o /opt/logs/tbt -c"
+  authorized mentioned as below was sysfs file like:
+  /sys/bus/thunderbolt/devices/0-X/authorized file.
 11-1  TBT_XS_FUNC_SECURE_MODE_WRONG tbt_func_test.sh -s secure_wrong
       Steps: Security was set secure, check tbt device connected,
              set wrong key in sysfs key, and fill 2 to authorized try to approve,
