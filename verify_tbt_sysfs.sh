@@ -599,6 +599,38 @@ tbt_main()
   topo_tbt_show
 }
 
+dev_under_tbt()
+{
+  local dev_node=$1
+
+  pci_dev=$(udevadm info --attribute-walk --name="$dev_node" \
+          | grep "KERNEL" \
+          | tail -n 2 \
+          | head -n 1 \
+          | awk -F '==' '{print $NF}' \
+          | cut -d '"' -f 2)
+  echo "$dev_node pci_dev:$pci_dev"
+  if [[ "$pci_dev" == "$ROOT_PCI" ]]; then
+    echo "$dev_node is under tbt device"
+    return 0
+  else
+    return 1
+  fi
+}
+
+find_tbt_dev_stuff()
+{
+  local dev_nodes=""
+  local dev_node=""
+
+  dev_nodes=$(ls -1 /dev/sd?)
+  for dev_node in $dev_nodes; do
+    dev_under_tbt "$dev_node"
+    [[ $? -eq 0 ]] || continue
+
+  done
+}
+
 test_print_trc "lspci -t: $pci_result"
 check_device_file
 check_domain_file
@@ -606,4 +638,5 @@ topo_tbt_show
 tbt_main
 find_root_pci
 tbt_us_pci
-#find_tbt_dev_stuff
+echo "root pci:$ROOT_PCI"
+find_tbt_dev_stuff
