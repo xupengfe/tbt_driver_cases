@@ -379,7 +379,7 @@ topo_view() {
   local device_num=""
 
   # Get tbt sys file in connection order
-  tbt_sys=$(ls -l ${TBT_PATH}/${domainn}*${tn} 2>/dev/null \
+  tbt_sys=$(ls -l ${TBT_PATH}/${domainx}*${tn} 2>/dev/null \
             | grep "-" \
             | awk '{ print length(), $0 | "sort -n" }' \
             | tail -n 1 \
