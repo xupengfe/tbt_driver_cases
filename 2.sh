@@ -4,6 +4,10 @@ PCI_PATH="/sys/bus/pci/devices"
 TBT_PATH="/sys/bus/thunderbolt/devices"
 REGEX_ITEM="-"
 HOST_EXCLUDE="\-0"
+PCI_HEX_FILE="/tmp/PCI_HEX.txt"
+PCI_DEC_FILE="/tmp/PCI_DEC.txt"
+PCI_HEX=""
+PCI_DEC=""
 
 find_root_pci()
 {
@@ -75,19 +79,35 @@ tbt_us_pci()
     exit 2
   }
   pcis=$(ls -1 $PCI_PATH)
+  cat /dev/null > $PCI_HEX_FILE
+  cat /dev/null > $PCI_DEC_FILE
   for pci in $pcis; do
     pci_ds=""
+    PCI_HEX=""
+    PCI_DEC=""
     pci_content=$(ls -ltra $PCI_PATH/$pci)
     [[ "$pci_content" == *"$ROOT_PCI"* ]] || continue
+
     pci_us=$(lspci -v -s $pci | grep -i upstream)
     if [[ -z "$pci_us" ]]; then
       continue
     else
       echo "Upstream pci:$pci"
+      PCI_HEX=$(echo $pci | cut -d ':' -f 2)
+      PCI_DEC=$((0x"$PCI_HEX"))
+      [[ "$PCI_DEC" -gt 3 ]] || {
+        echo "$PCI_DEC not greater than 3, skip"
+        continue
+      }
+      echo $PCI_HEX >> $PCI_HEX_FILE
+      echo $PCI_DEC >> $PCI_DEC_FILE
     fi
   done
+  echo "TBT device upstream PCI in hex:"
+  cat $PCI_HEX_FILE
+  echo "TBT device upstream PCI in dec:"
+  cat $PCI_DEC_FILE
 }
-
 
 find_root_pci
 #tbt_ds_pci
