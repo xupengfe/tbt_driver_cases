@@ -27,6 +27,25 @@
 #source "common.sh"  # Import do_cmd(), die() and other functions
 ############################# Functions ########################################
 TIME_FMT="%Y%m%d-%H%M%S.%N"
+TBT_DEV_FILE="/tmp/tbt_name.txt"
+TBT_PATH="/sys/bus/thunderbolt/devices"
+REGEX_DEVICE="-"
+REGEX_DOMAIN="domain"
+#DEVICE_FILES=("authorized" "device" "device_name" "nvm_authenticate" "nvm_version" "uevent" "unique_id" "vendor" "vendor_name")
+export DEVICE_FILES="authorized device device_name link_speed link_width nvm_authenticate nvm_version uevent unique_id vendor vendor_name power/control"
+export POWER_FILES="power/control power/runtime_status power/runtime_enabled"
+export DOMAIN_FILES="security uevent"
+AUTHORIZE_FILE="authorized"
+TOPO_FILE="/tmp/tbt_topo.txt"
+PCI_PATH="/sys/bus/pci/devices"
+HOST_EXCLUDE="\-0"
+PCI_HEX_FILE="/tmp/PCI_HEX.txt"
+PCI_DEC_FILE="/tmp/PCI_DEC.txt"
+PCI_HEX=""
+PCI_DEC=""
+
+rm -rf /root/test_tbt_1.log
+pci_result=$(lspci -t)
 
 usage()
 {
@@ -59,25 +78,87 @@ do case $arg in
 esac
 done
 
+find_root_pci()
+{
+  local icl=$(dmidecode | grep "ICL")
 
+  if [[ -n "$icl" ]]; then
+     echo "ICL platform"
+     tbt_dev=$(ls ${TBT_PATH} \
+             | grep "$REGEX_DEVICE" \
+             | grep -v "$HOST_EXCLUDE" \
+             | awk '{ print length(), $0 | "sort -n" }' \
+             | grep ^3 \
+             | cut -d ' ' -f 2 \
+             | head -n1)
 
+     case ${tbt_dev} in
+       0-1)
+         ROOT_PCI="0000:00:07.0"
+         ;;
+       0-3)
+         ROOT_PCI="0000:00:07.1"
+         ;;
+       1-1)
+         ROOT_PCI="0000:00:07.2"
+         ;;
+       1-3)
+         ROOT_PCI="0000:00:07.3"
+         ;;
+       *)
+         echo "ICL platform didn't find root pci, set 0000:00:07.0 as default!!!"
+         ROOT_PCI="0000:00:07.0"
+         ;;
+     esac
+  else
+    ROOT_PCI=$(udevadm info --attribute-walk --path=/sys/bus/thunderbolt/devices/0-0 | grep KERNEL | tail -n 2 | grep -v pci0000 | cut -d "\"" -f 2)
+    #ROOT_PCI="0000:03:00.0"
+  fi
+}
 
-############################ Default Values for Params##########################
-########################### REUSABLE TEST LOGIC ################################
-# Avoid using echo. Instead use print functions provided by st_log.sh
-TBT_PATH="/sys/bus/thunderbolt/devices"
-REGEX_DEVICE="-"
-REGEX_DOMAIN="domain"
-#DEVICE_FILES=("authorized" "device" "device_name" "nvm_authenticate" "nvm_version" "uevent" "unique_id" "vendor" "vendor_name")
-export DEVICE_FILES="authorized device device_name link_speed link_width nvm_authenticate nvm_version uevent unique_id vendor vendor_name power/control"
-export POWER_FILES="power/control power/runtime_status power/runtime_enabled"
-export DOMAIN_FILES="security uevent"
-AUTHORIZE_FILE="authorized"
-TOPO_FILE="/tmp/tbt_topo.txt"
+tbt_us_pci()
+{
+  local pcis=""
+  local pci=""
+  local pci_us=""
+  local pci_content=""
 
-rm -rf /root/test_tbt_1.log
-pci_result=$(lspci -t)
-test_print_trc "lspci -t: $pci_result"
+  [[ -n "$ROOT_PCI" ]] || {
+    echo "Could not find tbt root PCI, exit!"
+    exit 2
+  }
+  pcis=$(ls -1 $PCI_PATH)
+  cat /dev/null > $PCI_HEX_FILE
+  cat /dev/null > $PCI_DEC_FILE
+  for pci in $pcis; do
+    pci_ds=""
+    PCI_HEX=""
+    PCI_DEC=""
+    pci_content=$(ls -ltra $PCI_PATH/$pci)
+    [[ "$pci_content" == *"$ROOT_PCI"* ]] || continue
+
+    pci_us=$(lspci -v -s $pci | grep -i upstream)
+    if [[ -z "$pci_us" ]]; then
+      continue
+    else
+      #echo "Upstream pci:$pci"
+      PCI_HEX=$(echo $pci | cut -d ':' -f 2)
+      PCI_DEC=$((0x"$PCI_HEX"))
+      # Due to ICL tbt driver PCI 00:0d.2 and 00:0d.3
+      # hard code to greater than 3: tbt driver pci
+      [[ "$PCI_DEC" -gt 3 ]] || {
+        #echo "$PCI_DEC not greater than 3, skip"
+        continue
+      }
+      echo $PCI_HEX >> $PCI_HEX_FILE
+      echo $PCI_DEC >> $PCI_DEC_FILE
+    fi
+  done
+  #echo "TBT device upstream PCI in hex:"
+  #cat $PCI_HEX_FILE
+  #echo "TBT device upstream PCI in dec:"
+  #cat $PCI_DEC_FILE
+}
 
 enable_authorized()
 {
@@ -368,7 +449,8 @@ secure_mode_test()
 #   $1: domain num, 0 for domain0, 1 for domain1
 #   $2: branch num, 1 for domainX-1, 3 for domainX-3
 # Return: 0 for true, otherwise false or die
-topo_view() {
+topo_view()
+{
   local domainx=$1
   local tn=$2
   local tbt_sys=""
@@ -422,17 +504,39 @@ topo_view() {
       fi
     fi
   done
-  test_print_trc "device_topo: $device_topo"
+  echo "device_topo: $device_topo"
   echo "device_topo: $device_topo" >> $TOPO_FILE
-  test_print_trc "file_topo  : $file_topo"
+  echo "file_topo  : $file_topo"
   echo "file_topo  : $file_topo" >> $TOPO_FILE
+}
+
+tbt_dev_name()
+{
+  local domainx=$1
+  local tn=$2
+  local tbt_devs=""
+  local tbt_dev=""
+  local dev_name="device_name"
+
+  # Get tbt dev file in connection order
+  tbt_devs=$(ls -l ${TBT_PATH}/${domainx}*${tn} 2>/dev/null \
+            | grep "-" \
+            | awk '{ print length(), $0 | "sort -n" }' \
+            | tail -n 1 \
+            | awk -F "0-0/" '{print $2}' \
+            | tr '/' ' ')
+
+  for tbt_dev in $tbt_devs; do
+    echo $tbt_dev >> $TBT_DEV_FILE
+  done
 }
 
 # This function will check how many tbt device connected and
 # show the tbt devices how to connect, which one connect with which one
 # Inuput: NA
 # Return: 0 for true, otherwise false or die
-topo_tbt_show(){
+topo_tbt_show()
+{
   # tbt spec design tbt each domain will seprate to like 0-1 or 0-3 branch
   local t1="1"
   local t3="3"
@@ -446,64 +550,20 @@ topo_tbt_show(){
             | awk -F "->" '{print $1}')
 
   cat /dev/null > $TOPO_FILE
+  cat /dev/null > $TBT_DEV_FILE
 
   for domain in ${domains}; do
     topo_view "$domain" "$t1"
     topo_view "$domain" "$t3"
+    tbt_dev_name "$domain" "$t1"
+    tbt_dev_name "$domain" "$t3"
   done
   topo_result=$(cat $TOPO_FILE)
   [[ -n "$topo_result" ]] || {
     echo "tbt $TOPO_FILE is null:$topo_result!!!"
   }
-}
-
-topo_tbt_show_old() {
-  local tbt_sys=""
-  local tbt_file=""
-  local dev_name="device_name"
-  local device_topo=""
-  local file_topo=""
-  local device_num=""
-
-  # Get tbt sys file in connection order
-  tbt_sys=$(ls -1 ${TBT_PATH} \
-            | grep '-' \
-            | awk '{ print length(), $0 | "sort -n" }' \
-            | cut -d ' ' -f 2)
-  #tbt_sys=$(echo "$tbt_sys" | tr '\n' ' ')
-  #test_print_trc "tbt_sys:$tbt_sys"
-  # Get last file
-  last=$(echo $tbt_sys | awk '{print $NF}')
-  device_num=$(echo $tbt_sys | awk '{print NF-1}')
-  #test_print_trc "last: $last, device_num:$device_num"
-  test_print_trc "***  $device_num TBT devices detected as below  ***"
-
-  # Last file not add <->
-  for tbt_file in ${tbt_sys}; do
-    if [ "$tbt_file" == "$last" ]; then
-      device_file=$(cat ${TBT_PATH}/${tbt_file}/${dev_name})
-      device_topo=${device_topo}${device_file}
-      file_topo=${file_topo}${tbt_file}
-    else
-      device_file=$(cat ${TBT_PATH}/${tbt_file}/${dev_name})
-      device_file_num=${#device_file}
-      tbt_file_num=${#tbt_file}
-      if [ $device_file_num -gt $tbt_file_num ]; then
-        gap=$((device_file_num - tbt_file_num))
-        device_topo=${device_topo}${device_file}" <-> "
-        file_topo=${file_topo}${tbt_file}
-        for ((c=1; c<=gap; c++)); do
-          file_topo=${file_topo}" "
-        done
-        file_topo=${file_topo}" <-> "
-      else
-        device_topo=${device_topo}${device_file}" <-> "
-        file_topo=${file_topo}${tbt_file}" <-> "
-      fi
-    fi
-  done
-test_print_trc "device_topo: $device_topo"
-test_print_trc "file_topo  : $file_topo"
+  echo "tbt dev names list:"
+  cat $TBT_DEV_FILE
 }
 
 tbt_main()
@@ -539,7 +599,11 @@ tbt_main()
   topo_tbt_show
 }
 
+test_print_trc "lspci -t: $pci_result"
 check_device_file
 check_domain_file
 topo_tbt_show
 tbt_main
+find_root_pci
+tbt_us_pci
+#find_tbt_dev_stuff
