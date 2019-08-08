@@ -48,6 +48,7 @@ DEV_SERIAL=""
 DEV_PCI=""
 TBT_DEV_NAME=""
 STUFF_FILE="/tmp/tbt_stuff.txt"
+TBT_STUFF_LIST="/tmp/tbt_stuff_list.txt"
 
 rm -rf /root/test_tbt_1.log
 pci_result=$(lspci -t)
@@ -567,8 +568,7 @@ topo_tbt_show()
   [[ -n "$topo_result" ]] || {
     echo "tbt $TOPO_FILE is null:$topo_result!!!"
   }
-  echo "tbt dev names list:"
-  cat $TBT_DEV_FILE
+  #cat $TBT_DEV_FILE
 }
 
 tbt_main()
@@ -653,7 +653,7 @@ stuff_in_tbt()
     if [[ "$dev_pci_d" -gt "$tbt_pci" ]]; then
       TBT_DEV_NAME=$(sed -n ${tbt_num}p $TBT_DEV_FILE)
       DEV_PCI=$dev_pci_h
-      echo "$dev_node pci:$DEV_PCI connected with $TBT_DEV_NAME"
+      #echo "$dev_node pci:$DEV_PCI connected with $TBT_DEV_NAME"
       break
     else
       continue
@@ -701,11 +701,31 @@ dev_under_tbt()
         ;;
     esac
     stuff_in_tbt "$dev_node"
-    echo "$dev_node:$DEV_TYPE:$DEV_SERIAL:pci(${DEV_PCI}:00) $TBT_DEV_NAME" >> $STUFF_FILE
+    echo " |-> $dev_node $DEV_TYPE pci-${DEV_PCI}:00 $DEV_SERIAL $TBT_DEV_NAME" >> $STUFF_FILE
     return 0
   else
     return 1
   fi
+}
+
+list_tbt_stuff()
+{
+  local tbt_devs=""
+  local tbt_dev=""
+  local tbt_stuff=""
+
+  cat /dev/null > $TBT_STUFF_LIST
+  tbt_devs=$(cat $TBT_DEV_FILE)
+  for tbt_dev in $tbt_devs; do
+    tbt_stuff=""
+    echo "$tbt_dev" >> $TBT_STUFF_LIST
+    tbt_stuff=$(cat $STUFF_FILE \
+              | grep $tbt_dev \
+              | awk -F " $tbt_dev" '{print $1}')
+    [[ -z "$tbt_stuff" ]] || \
+      echo "$tbt_stuff" >> $TBT_STUFF_LIST
+  done
+  cat $TBT_STUFF_LIST
 }
 
 find_tbt_dev_stuff()
@@ -719,6 +739,7 @@ find_tbt_dev_stuff()
     dev_under_tbt "$dev_node"
     [[ $? -eq 0 ]] || continue
   done
+  list_tbt_stuff
 }
 
 check_tbt_us_pci()
@@ -731,7 +752,6 @@ check_tbt_us_pci()
 
   [[ "$tbt_dev_num" -eq "$tbt_us_num" ]] || {
    echo "$TBT_DEV_FILE num:$tbt_dev_num not equal $PCI_DEC_FILE num:$tbt_us_num"
-   echo "*****WARN: please copy all logs and mail to pengfei.xu@intel.com *****"
    return 1
   }
 }
