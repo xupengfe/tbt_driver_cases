@@ -735,7 +735,11 @@ find_tbt_dev_stuff()
   local dev_node=""
 
   cat /dev/null > $STUFF_FILE
-  dev_nodes=$(ls -1 /dev/sd?)
+  dev_nodes=$(ls -1 /dev/sd? 2>/dev/null)
+  [[ -z "$dev_nodes" ]] && {
+    echo "No /dev/sd? node find:$dev_nodes"
+    exit 0
+  }
   for dev_node in $dev_nodes; do
     dev_under_tbt "$dev_node"
     [[ $? -eq 0 ]] || continue
