@@ -120,6 +120,7 @@ find_root_pci()
     ROOT_PCI=$(udevadm info --attribute-walk --path=/sys/bus/thunderbolt/devices/0-0 | grep KERNEL | tail -n 2 | grep -v pci0000 | cut -d "\"" -f 2)
     #ROOT_PCI="0000:03:00.0"
   fi
+  echo "ROOT_PCI:$ROOT_PCI"
 }
 
 tbt_us_pci()
@@ -488,11 +489,11 @@ topo_view()
   # Last file not add <-> in the end
   for tbt_file in ${tbt_sys}; do
     if [ "$tbt_file" == "$last" ]; then
-      device_file=$(cat ${TBT_PATH}/${tbt_file}/${dev_name})
+      device_file=$(cat ${TBT_PATH}/${tbt_file}/${dev_name} 2>/dev/null)
       device_topo=${device_topo}${device_file}
       file_topo=${file_topo}${tbt_file}
     else
-      device_file=$(cat ${TBT_PATH}/${tbt_file}/${dev_name})
+      device_file=$(cat ${TBT_PATH}/${tbt_file}/${dev_name} 2>/dev/null)
       # For alignment for such as 0-0 and device name, device name is longer
       device_file_num=${#device_file}
       tbt_file_num=${#tbt_file}
@@ -769,6 +770,7 @@ check_device_file
 check_domain_file
 topo_tbt_show
 tbt_main
+echo
 find_root_pci
 tbt_us_pci
 check_tbt_us_pci
