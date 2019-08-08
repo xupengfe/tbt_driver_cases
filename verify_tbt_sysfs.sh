@@ -611,7 +611,7 @@ check_usb_type()
 
   speed=$(udevadm info --attribute-walk --name="$dev_node" \
         | grep speed \
-        | tail -n 1 \
+        | head -n 1 \
         | cut -d '"' -f 2)
 
   case $speed in
@@ -644,24 +644,25 @@ stuff_in_tbt()
           | head -n 1 \
           | awk -F "0000:" '{print $NF}' \
           | cut -d ':' -f 1)
-  dev_pci_d=$((0x"$dev_pci_x"))
-  echo "$dev_node PCI: 0x$dev_pci_h $dev_pci_d"
+  dev_pci_d=$((0x"$dev_pci_h"))
   tbt_num=$(cat $TBT_DEV_FILE | wc -l)
   for (( ;tbt_num>0;tbt_num--)); do
     TBT_DEV_NAME=""
     DEV_PCI=""
-    tbt_pci=$(sed -n ${tbt_num}p $PCI_DEV_FILE)
+    tbt_pci=$(sed -n ${tbt_num}p $PCI_DEC_FILE)
     if [[ "$dev_pci_d" -gt "$tbt_pci" ]]; then
       TBT_DEV_NAME=$(sed -n ${tbt_num}p $TBT_DEV_FILE)
       DEV_PCI=$dev_pci_h
       echo "$dev_node pci:$DEV_PCI connected with $TBT_DEV_NAME"
-      return 0
+      break
     else
       continue
     fi
   done
-  echo "Could not find $dev_node connected with which tbt device!!!"
-  echo "*****WARN: please copy all logs and mail to pengfei.xu@intel.com *****"
+  [[ -n "$TBT_DEV_NAME" ]] || {
+    echo "Not detect $dev_node connected with which tbt device!!!"
+    return 1
+  }
 }
 
 dev_under_tbt()
@@ -679,7 +680,7 @@ dev_under_tbt()
           | cut -d '"' -f 2)
   #echo "$dev_node pci_dev:$pci_dev"
   if [[ "$pci_dev" == "$ROOT_PCI" ]]; then
-    echo "$dev_node is under tbt device"
+    #echo "$dev_node is under tbt device"
     dev_tp=$(udevadm info --query=all --name="$dev_node" \
               | grep "ID_BUS=" \
               | cut -d '=' -f 2)
@@ -700,7 +701,7 @@ dev_under_tbt()
         ;;
     esac
     stuff_in_tbt "$dev_node"
-    echo "$dev_node-$DEV_TYPE-$DEV_SERIAL-$DEV_PCI $TBT_DEV_NAME" >> $STUFF_FILE
+    echo "$dev_node:$DEV_TYPE:$DEV_SERIAL:pci(${DEV_PCI}:00) $TBT_DEV_NAME" >> $STUFF_FILE
     return 0
   else
     return 1
