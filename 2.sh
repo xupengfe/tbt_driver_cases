@@ -95,6 +95,8 @@ tbt_us_pci()
       echo "Upstream pci:$pci"
       PCI_HEX=$(echo $pci | cut -d ':' -f 2)
       PCI_DEC=$((0x"$PCI_HEX"))
+      # Due to ICL tbt driver PCI 00:0d.2 and 00:0d.3
+      # hard code to greater than 3: tbt driver pci
       [[ "$PCI_DEC" -gt 3 ]] || {
         echo "$PCI_DEC not greater than 3, skip"
         continue
