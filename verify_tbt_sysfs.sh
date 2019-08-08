@@ -714,14 +714,17 @@ list_tbt_stuff()
   local tbt_devs=""
   local tbt_dev=""
   local tbt_stuff=""
+  local tbt_de_name=""
 
   cat /dev/null > $TBT_STUFF_LIST
   tbt_devs=$(cat $TBT_DEV_FILE)
   for tbt_dev in $tbt_devs; do
     tbt_stuff=""
-    echo "$tbt_dev" >> $TBT_STUFF_LIST
+    tbt_de_name=""
+    tbt_de_name=$(cat ${TBT_PATH}/${tbt_dev}/device_name)
+    echo "$tbt_dev:$tbt_de_name" >> $TBT_STUFF_LIST
     tbt_stuff=$(cat $STUFF_FILE \
-              | grep $tbt_dev \
+              | grep "${tbt_dev}$" \
               | awk -F " $tbt_dev" '{print $1}')
     [[ -z "$tbt_stuff" ]] || \
       echo "$tbt_stuff" >> $TBT_STUFF_LIST
