@@ -39,10 +39,12 @@ AUTHORIZE_FILE="authorized"
 TOPO_FILE="/tmp/tbt_topo.txt"
 PCI_PATH="/sys/bus/pci/devices"
 HOST_EXCLUDE="\-0"
-PCI_HEX_FILE="/tmp/PCI_HEX.txt"
-PCI_DEC_FILE="/tmp/PCI_DEC.txt"
+PCI_HEX_FILE="/tmp/pci_hex.txt"
+PCI_DEC_FILE="/tmp/pci_dec.txt"
 PCI_HEX=""
 PCI_DEC=""
+DEV_TYPE=""
+DEV_SERIAL=""
 
 rm -rf /root/test_tbt_1.log
 pci_result=$(lspci -t)
@@ -469,14 +471,14 @@ topo_view()
             | tr '/' ' ')
 
   [ -n "$tbt_sys" ] || {
-    test_print_trc "No tbt device in $domainx-$tn!"
+    echo "No tbt device in $domainx-$tn!"
     return 1
   }
 
   # Get last file
   last=$(echo $tbt_sys | awk '{print $NF}')
   device_num=$(echo $tbt_sys | awk '{print NF-1}')
-  test_print_trc "$domainx-$tn contain $device_num tbt devices:"
+  echo "$domainx-$tn contain $device_num tbt devices:"
   echo "$domainx-$tn contain $device_num tbt devices:" >> $TOPO_FILE
 
   # Last file not add <-> in the end
@@ -602,6 +604,9 @@ tbt_main()
 dev_under_tbt()
 {
   local dev_node=$1
+  local dev_tp=""
+  local DEV_NAME=""
+  local DEV_TYPE=""
 
   pci_dev=$(udevadm info --attribute-walk --name="$dev_node" \
           | grep "KERNEL" \
@@ -609,9 +614,28 @@ dev_under_tbt()
           | head -n 1 \
           | awk -F '==' '{print $NF}' \
           | cut -d '"' -f 2)
-  echo "$dev_node pci_dev:$pci_dev"
+  #echo "$dev_node pci_dev:$pci_dev"
   if [[ "$pci_dev" == "$ROOT_PCI" ]]; then
     echo "$dev_node is under tbt device"
+    dev_tp=$(udevadm info --query=all --name="$dev_node" \
+              | grep "ID_BUS=" \
+              | cut -d '=' -f 2)
+    DEV_NAME=$(udevadm info --query=all --name="$dev_node" \
+              | grep "ID_SERIAL=" \
+              | cut -d '-' -f 1 \
+              | cut -d '=' -f 2)
+    case $dev_tp in
+      ata)
+	DEV_TYPE="HDD"
+	;;
+      usb)
+        check_usb_type
+	;;
+      *)
+        echo "WARN:$dev_node is one unknow type:$dev_tp"
+        DEV_TYPE="$dev_tp"
+	;;
+    esac
     return 0
   else
     return 1
@@ -638,5 +662,4 @@ topo_tbt_show
 tbt_main
 find_root_pci
 tbt_us_pci
-echo "root pci:$ROOT_PCI"
 find_tbt_dev_stuff
