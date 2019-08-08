@@ -45,6 +45,9 @@ PCI_HEX=""
 PCI_DEC=""
 DEV_TYPE=""
 DEV_SERIAL=""
+DEV_PCI=""
+TBT_DEV_NAME=""
+STUFF_FILE="/tmp/tbt_stuff.txt"
 
 rm -rf /root/test_tbt_1.log
 pci_result=$(lspci -t)
@@ -601,12 +604,72 @@ tbt_main()
   topo_tbt_show
 }
 
+check_usb_type()
+{
+  local dev_node=$1
+  local speed=""
+
+  speed=$(udevadm info --attribute-walk --name="$dev_node" \
+        | grep speed \
+        | tail -n 1 \
+        | cut -d '"' -f 2)
+
+  case $speed in
+    480)
+      DEV_TYPE="USB2.0"
+      ;;
+    5000)
+      DEV_TYPE="USB3.0"
+      ;;
+    10000)
+      DEV_TYPE="USB3.1"
+      ;;
+    *)
+      echo "WARN:$dev_node:USB unknow speed->$speed"
+      DEV_TYPE="USB_unknow_type"
+      ;;
+  esac
+}
+
+stuff_in_tbt()
+{
+  local dev_node=$1
+  local tbt_num=""
+  local dev_pci_h=""
+  local dev_pci_d=""
+  local tbt_pci=""
+
+  dev_pci_h=$(udevadm info --attribute-walk --name="$dev_node" \
+          | grep "looking" \
+          | head -n 1 \
+          | awk -F "0000:" '{print $NF}' \
+          | cut -d ':' -f 1)
+  dev_pci_d=$((0x"$dev_pci_x"))
+  echo "$dev_node PCI: 0x$dev_pci_h $dev_pci_d"
+  tbt_num=$(cat $TBT_DEV_FILE | wc -l)
+  for (( ;tbt_num>0;tbt_num--)); do
+    TBT_DEV_NAME=""
+    DEV_PCI=""
+    tbt_pci=$(sed -n ${tbt_num}p $PCI_DEV_FILE)
+    if [[ "$dev_pci_d" -gt "$tbt_pci" ]]; then
+      TBT_DEV_NAME=$(sed -n ${tbt_num}p $TBT_DEV_FILE)
+      DEV_PCI=$dev_pci_h
+      echo "$dev_node pci:$DEV_PCI connected with $TBT_DEV_NAME"
+      return 0
+    else
+      continue
+    fi
+  done
+  echo "Could not find $dev_node connected with which tbt device!!!"
+  echo "*****WARN: please copy all logs and mail to pengfei.xu@intel.com *****"
+}
+
 dev_under_tbt()
 {
   local dev_node=$1
   local dev_tp=""
-  local DEV_NAME=""
-  local DEV_TYPE=""
+  DEV_SERIAL=""
+  DEV_TYPE=""
 
   pci_dev=$(udevadm info --attribute-walk --name="$dev_node" \
           | grep "KERNEL" \
@@ -620,22 +683,24 @@ dev_under_tbt()
     dev_tp=$(udevadm info --query=all --name="$dev_node" \
               | grep "ID_BUS=" \
               | cut -d '=' -f 2)
-    DEV_NAME=$(udevadm info --query=all --name="$dev_node" \
+    DEV_SERIAL=$(udevadm info --query=all --name="$dev_node" \
               | grep "ID_SERIAL=" \
               | cut -d '-' -f 1 \
               | cut -d '=' -f 2)
     case $dev_tp in
       ata)
-	DEV_TYPE="HDD"
-	;;
+        DEV_TYPE="HDD"
+        ;;
       usb)
-        check_usb_type
-	;;
+        check_usb_type "$dev_node"
+        ;;
       *)
         echo "WARN:$dev_node is one unknow type:$dev_tp"
         DEV_TYPE="$dev_tp"
-	;;
+        ;;
     esac
+    stuff_in_tbt "$dev_node"
+    echo "$dev_node-$DEV_TYPE-$DEV_SERIAL-$DEV_PCI $TBT_DEV_NAME" >> $STUFF_FILE
     return 0
   else
     return 1
@@ -647,12 +712,27 @@ find_tbt_dev_stuff()
   local dev_nodes=""
   local dev_node=""
 
+  cat /dev/null > $STUFF_FILE
   dev_nodes=$(ls -1 /dev/sd?)
   for dev_node in $dev_nodes; do
     dev_under_tbt "$dev_node"
     [[ $? -eq 0 ]] || continue
-
   done
+}
+
+check_tbt_us_pci()
+{
+  local tbt_dev_num=""
+  local tbt_us_num=""
+
+  tbt_dev_num=$(cat $TBT_DEV_FILE | wc -l)
+  tbt_us_num=$(cat $PCI_DEC_FILE | wc -l)
+
+  [[ "$tbt_dev_num" -eq "$tbt_us_num" ]] || {
+   echo "$TBT_DEV_FILE num:$tbt_dev_num not equal $PCI_DEC_FILE num:$tbt_us_num"
+   echo "*****WARN: please copy all logs and mail to pengfei.xu@intel.com *****"
+   return 1
+  }
 }
 
 test_print_trc "lspci -t: $pci_result"
@@ -662,4 +742,5 @@ topo_tbt_show
 tbt_main
 find_root_pci
 tbt_us_pci
+check_tbt_us_pci
 find_tbt_dev_stuff
