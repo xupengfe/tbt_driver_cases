@@ -567,6 +567,7 @@ topo_tbt_show()
   topo_result=$(cat $TOPO_FILE)
   [[ -n "$topo_result" ]] || {
     echo "tbt $TOPO_FILE is null:$topo_result!!!"
+    exit 2
   }
   #cat $TBT_DEV_FILE
 }
