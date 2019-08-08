@@ -49,6 +49,8 @@ DEV_PCI=""
 TBT_DEV_NAME=""
 STUFF_FILE="/tmp/tbt_stuff.txt"
 TBT_STUFF_LIST="/tmp/tbt_stuff_list.txt"
+PLATFORM=""
+TBT_NUM=""
 
 rm -rf /root/test_tbt_1.log
 pci_result=$(lspci -t)
@@ -90,6 +92,7 @@ find_root_pci()
 
   if [[ -n "$icl" ]]; then
      echo "ICL platform"
+     PLATFORM="ICL"
      tbt_dev=$(ls ${TBT_PATH} \
              | grep "$REGEX_DEVICE" \
              | grep -v "$HOST_EXCLUDE" \
@@ -530,9 +533,8 @@ tbt_dev_name()
             | grep "-" \
             | awk '{ print length(), $0 | "sort -n" }' \
             | tail -n 1 \
-            | awk -F "0-0/" '{print $2}' \
+            | awk -F "${domainx}-0/" '{print $2}' \
             | tr '/' ' ')
-
   for tbt_dev in $tbt_devs; do
     echo $tbt_dev >> $TBT_DEV_FILE
   done
@@ -636,10 +638,11 @@ check_usb_type()
 stuff_in_tbt()
 {
   local dev_node=$1
-  local tbt_num=""
   local dev_pci_h=""
   local dev_pci_d=""
   local tbt_pci=""
+  local num=""
+  local num_add=""
 
   dev_pci_h=$(udevadm info --attribute-walk --name="$dev_node" \
           | grep "looking" \
@@ -647,13 +650,14 @@ stuff_in_tbt()
           | awk -F "0000:" '{print $NF}' \
           | cut -d ':' -f 1)
   dev_pci_d=$((0x"$dev_pci_h"))
-  tbt_num=$(cat $TBT_DEV_FILE | wc -l)
-  for (( ;tbt_num>0;tbt_num--)); do
+  for ((num=1;num<=TBT_NUM;num++)); do
     TBT_DEV_NAME=""
     DEV_PCI=""
-    tbt_pci=$(sed -n ${tbt_num}p $PCI_DEC_FILE)
-    if [[ "$dev_pci_d" -gt "$tbt_pci" ]]; then
-      TBT_DEV_NAME=$(sed -n ${tbt_num}p $TBT_DEV_FILE)
+    num_add=$((num+1))
+
+    tbt_pci=$(sed -n ${num_add}p $PCI_DEC_FILE)
+    if [[ "$dev_pci_d" -lt "$tbt_pci" ]]; then
+      TBT_DEV_NAME=$(sed -n ${num}p $TBT_DEV_FILE)
       DEV_PCI=$dev_pci_h
       #echo "$dev_node pci:$DEV_PCI connected with $TBT_DEV_NAME"
       break
@@ -761,7 +765,13 @@ check_tbt_us_pci()
 
   [[ "$tbt_dev_num" -eq "$tbt_us_num" ]] || {
    echo "$TBT_DEV_FILE num:$tbt_dev_num not equal $PCI_DEC_FILE num:$tbt_us_num"
-   return 1
+    if [[ "$tbt_dev_num" -gt "$tbt_us_num" ]]; then
+      TBT_NUM=$tbt_us_num
+    else
+      TBT_NUM=$tbt_dev_num
+    fi
+    echo "TBT_NUM:$TBT_NUM"
+    return 1
   }
 }
 
