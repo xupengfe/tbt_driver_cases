@@ -51,6 +51,7 @@ STUFF_FILE="/tmp/tbt_stuff.txt"
 TBT_STUFF_LIST="/tmp/tbt_stuff_list.txt"
 PLATFORM=""
 TBT_NUM=""
+ROOT_PCI=""
 
 rm -rf /root/test_tbt_1.log
 pci_result=$(lspci -t)
@@ -85,46 +86,6 @@ do case $arg in
                         ;;
 esac
 done
-
-find_root_pci()
-{
-  local icl=$(dmidecode | grep "ICL")
-
-  if [[ -n "$icl" ]]; then
-     echo "ICL platform"
-     PLATFORM="ICL"
-     tbt_dev=$(ls ${TBT_PATH} \
-             | grep "$REGEX_DEVICE" \
-             | grep -v "$HOST_EXCLUDE" \
-             | awk '{ print length(), $0 | "sort -n" }' \
-             | grep ^3 \
-             | cut -d ' ' -f 2 \
-             | head -n1)
-
-     case ${tbt_dev} in
-       0-1)
-         ROOT_PCI="0000:00:07.0"
-         ;;
-       0-3)
-         ROOT_PCI="0000:00:07.1"
-         ;;
-       1-1)
-         ROOT_PCI="0000:00:07.2"
-         ;;
-       1-3)
-         ROOT_PCI="0000:00:07.3"
-         ;;
-       *)
-         echo "ICL platform didn't find root pci, set 0000:00:07.0 as default!!!"
-         ROOT_PCI="0000:00:07.0"
-         ;;
-     esac
-  else
-    ROOT_PCI=$(udevadm info --attribute-walk --path=/sys/bus/thunderbolt/devices/0-0 | grep KERNEL | tail -n 2 | grep -v pci0000 | cut -d "\"" -f 2)
-    #ROOT_PCI="0000:03:00.0"
-  fi
-  echo "ROOT_PCI:$ROOT_PCI"
-}
 
 tbt_us_pci()
 {
@@ -168,6 +129,28 @@ tbt_us_pci()
   #cat $PCI_HEX_FILE
   #echo "TBT device upstream PCI in dec:"
   #cat $PCI_DEC_FILE
+}
+
+find_root_pci()
+{
+  local tbt_devs=""
+  local pf_name=$(dmidecode --type bios \
+                 | grep Version \
+                 | cut -d ':' -f 2)
+  #local pf_name=$(dmidecode | grep "ICL")
+
+  case $pf_name in
+    *ICL*)
+      echo "ICL platform"
+      PLATFORM="ICL"
+      ROOT_PCI="00:07"
+      ;;
+    *)
+     ROOT_PCI=$(udevadm info --attribute-walk --path=/sys/bus/thunderbolt/devices/0-0 | grep KERNEL | tail -n 2 | grep -v pci0000 | cut -d "\"" -f 2)
+     #ROOT_PCI="0000:03:00.0"
+     ;;
+  esac
+  echo "ROOT_PCI:$ROOT_PCI"
 }
 
 enable_authorized()
@@ -685,7 +668,7 @@ dev_under_tbt()
           | awk -F '==' '{print $NF}' \
           | cut -d '"' -f 2)
   #echo "$dev_node pci_dev:$pci_dev"
-  if [[ "$pci_dev" == "$ROOT_PCI" ]]; then
+  if [[ "$pci_dev" == *"$ROOT_PCI"* ]]; then
     #echo "$dev_node is under tbt device"
     dev_tp=$(udevadm info --query=all --name="$dev_node" \
               | grep "ID_BUS=" \
@@ -765,6 +748,7 @@ check_tbt_us_pci()
 
   [[ "$tbt_dev_num" -eq "$tbt_us_num" ]] || {
    echo "$TBT_DEV_FILE num:$tbt_dev_num not equal $PCI_DEC_FILE num:$tbt_us_num"
+   echo "WARN: tbt stuffs maybe not correct due to above reason!!!"
     if [[ "$tbt_dev_num" -gt "$tbt_us_num" ]]; then
       TBT_NUM=$tbt_us_num
     else
