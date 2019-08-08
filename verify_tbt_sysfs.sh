@@ -150,7 +150,7 @@ find_root_pci()
      #ROOT_PCI="0000:03:00.0"
      ;;
   esac
-  echo "ROOT_PCI:$ROOT_PCI"
+  #echo "ROOT_PCI:$ROOT_PCI"
 }
 
 enable_authorized()
@@ -638,6 +638,12 @@ stuff_in_tbt()
     DEV_PCI=""
     num_add=$((num+1))
 
+    [[ "$num_add" -gt "$TBT_NUM" ]] && {
+      TBT_DEV_NAME=$(sed -n ${num}p $TBT_DEV_FILE)
+      DEV_PCI=$dev_pci_h
+      break
+    }
+
     tbt_pci=$(sed -n ${num_add}p $PCI_DEC_FILE)
     if [[ "$dev_pci_d" -lt "$tbt_pci" ]]; then
       TBT_DEV_NAME=$(sed -n ${num}p $TBT_DEV_FILE)
@@ -649,7 +655,7 @@ stuff_in_tbt()
     fi
   done
   [[ -n "$TBT_DEV_NAME" ]] || {
-    echo "Not detect $dev_node connected with which tbt device!!!"
+    echo " No detect $dev_node dev:$dev_pci_d us:$tbt_pci connected with which tbt device!!!"
     return 1
   }
 }
@@ -747,8 +753,8 @@ check_tbt_us_pci()
   tbt_us_num=$(cat $PCI_DEC_FILE | wc -l)
 
   [[ "$tbt_dev_num" -eq "$tbt_us_num" ]] || {
-   echo "$TBT_DEV_FILE num:$tbt_dev_num not equal $PCI_DEC_FILE num:$tbt_us_num"
-   echo "WARN: tbt stuffs maybe not correct due to above reason!!!"
+    echo "$TBT_DEV_FILE num:$tbt_dev_num not equal $PCI_DEC_FILE num:$tbt_us_num"
+    echo "WARN: tbt stuffs maybe not correct due to above reason!!!"
     if [[ "$tbt_dev_num" -gt "$tbt_us_num" ]]; then
       TBT_NUM=$tbt_us_num
     else
@@ -757,6 +763,7 @@ check_tbt_us_pci()
     echo "TBT_NUM:$TBT_NUM"
     return 1
   }
+  TBT_NUM=$tbt_dev_num
 }
 
 test_print_trc "lspci -t: $pci_result"
