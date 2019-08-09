@@ -474,12 +474,14 @@ topo_view()
 
   # Last file not add <-> in the end
   for tbt_file in ${tbt_sys}; do
+    device_file=""
     if [ "$tbt_file" == "$last" ]; then
       device_file=$(cat ${TBT_PATH}/${tbt_file}/${dev_name} 2>/dev/null)
       device_topo=${device_topo}${device_file}
       file_topo=${file_topo}${tbt_file}
     else
       device_file=$(cat ${TBT_PATH}/${tbt_file}/${dev_name} 2>/dev/null)
+      [[ -n "$device_file" ]] || device_file="no_name"
       # For alignment for such as 0-0 and device name, device name is longer
       device_file_num=${#device_file}
       tbt_file_num=${#tbt_file}
