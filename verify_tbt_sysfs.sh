@@ -93,11 +93,17 @@ tbt_us_pci()
   local pci=""
   local pci_us=""
   local pci_content=""
+  local dr_pci_h=""
+  local dr_pci_d=""
 
   [[ -n "$ROOT_PCI" ]] || {
     echo "Could not find tbt root PCI, exit!"
     exit 2
   }
+  dr_pci_h=$(udevadm info -q path --path=${TBT_PATH}/domain0 \
+            | awk -F "/" '{print $(NF-1)}' \
+            | cut -d ':' -f 2)
+  dr_pci_d=$((0x"$dr_pci_h"))
   pcis=$(ls -1 $PCI_PATH)
   cat /dev/null > $PCI_HEX_FILE
   cat /dev/null > $PCI_DEC_FILE
@@ -116,8 +122,8 @@ tbt_us_pci()
       PCI_HEX=$(echo $pci | cut -d ':' -f 2)
       PCI_DEC=$((0x"$PCI_HEX"))
       # Due to ICL tbt driver PCI 00:0d.2 and 00:0d.3
-      # hard code to greater than 3: tbt driver pci
-      [[ "$PCI_DEC" -gt 3 ]] || {
+      # ICL no impact, due to ICL dr pci is 00
+      [[ "$PCI_DEC" -gt "$dr_pci_d" ]] || {
         #echo "$PCI_DEC not greater than 3, skip"
         continue
       }
