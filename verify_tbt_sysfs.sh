@@ -151,6 +151,11 @@ find_root_pci()
       PLATFORM="ICL"
       ROOT_PCI="00:07"
       ;;
+    *TGL*)
+      echo "TGL platform"
+      PLATFORM="TGL"
+      ROOT_PCI="00:07"
+      ;;
     *)
      ROOT_PCI=$(udevadm info --attribute-walk --path=/sys/bus/thunderbolt/devices/0-0 | grep KERNEL | tail -n 2 | grep -v pci0000 | cut -d "\"" -f 2)
      #ROOT_PCI="0000:03:00.0"
