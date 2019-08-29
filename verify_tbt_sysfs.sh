@@ -785,6 +785,8 @@ check_domain_file
 topo_tbt_show
 tbt_main
 echo
+# due to falcon ridge find pci a little slow
+sleep 1
 find_root_pci
 tbt_us_pci
 check_tbt_us_pci
