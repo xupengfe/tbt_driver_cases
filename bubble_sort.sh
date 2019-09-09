@@ -45,7 +45,6 @@ sort() {
   i=$((i-1))
 
   for((sort_nb=1;sort_nb<i;sort_nb++)); do
-    bubble_sort "$sort_nb"
     sort_max=$((i-sort_nb+1))
     #echo "sort_max:$sort_max"
     for ((sort_n=1;sort_n<sort_max;sort_n++)); do
