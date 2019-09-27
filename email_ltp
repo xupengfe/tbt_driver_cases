@@ -1,0 +1,32 @@
+#!/bin/bash
+
+version=
+[[ $1 =~ ^v[1-9]$ ]] && {
+	version=" $1"
+	shift
+}
+
+repo="LTP"
+
+files=$(git format-patch -M --subject-prefix="$repo] [PATCH$version" "${@:--1}")
+
+for file in $files
+do
+	[[ -f /tmp/$file ]] && diff /tmp/$file $file && {
+		echo "The same patch /tmp/$file already exists"
+		exit
+	}
+done
+
+git send-email	-q \
+		--confirm=never \
+		--no-signed-off-by-cc \
+		--no-chain-reply-to \
+		--to="ltp <ltp@lists.linux.it>" \
+		--to="Pengfei Xu <pengfei.xu@intel.com>" \
+		--to="Neri Ricardo <ricardo.neri@intel.com>" \
+		--to="Su Heng <heng.su@intel.com>" \
+		--to="Cyril Hrubis <chrubis@suse.cz>" \
+		$files
+
+mv -f $files /tmp
