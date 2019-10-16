@@ -72,7 +72,15 @@ install_kernel_rpm() {
   echo "cp -rf $config /lib/kernel/"
   cp -rf $config /lib/kernel/
 
-  node=$(fdisk -l  | grep EFI | tail -n 1 | cut -d ' ' -f 1)
+  node=$(fdisk -l  \
+        | grep -C5 root \
+        | grep -i EFI \
+        | head -n 1 \
+        | cut -d ' ' -f 1)
+  [[ -n "$node" ]] || node=$(fdisk -l \
+                            | grep -i EFI \
+                            | head -n 1 \
+                            | cut -d ' ' -f 1)
   loader="/mnt/loader/loader.conf"
 
   echo "umount -f /mnt"
