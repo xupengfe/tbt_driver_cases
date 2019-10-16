@@ -562,7 +562,9 @@ topo_name()
       fi
     fi
   done
+  echo "device_topo: $device_topo"
   echo "device_topo: $device_topo" >> "$devs_file"
+  echo "file_topo  : $file_topo"
   echo "file_topo  : $file_topo" >> "$devs_file"
 }
 
@@ -575,7 +577,6 @@ usb4_view()
   local device_num=""
   local dev_item=""
   local check_point=""
-  local devs_file="/tmp/tbt_view.txt"
 
   ls -l ${TBT_PATH}/${domainx}*${tn} 2>/dev/null \
     | grep "-" \
@@ -596,6 +597,7 @@ usb4_view()
     | grep "${tn}$" \
     | wc -l)
   echo "$domainx-$tn contains $device_num tbt devices."
+  echo "$domainx-$tn contains $device_num tbt devices." >> $TOPO_FILE
   cat /dev/null > "${DEV_FILE}_${domainx}_${tn}"
   cp -rf "$tbt_sys_file" "${DEV_FILE}_${domainx}_${tn}"
   for tbt_dev in $tbt_devs; do
@@ -616,12 +618,10 @@ usb4_view()
     sed -i "/${check_point}$/d" "${DEV_FILE}_${domainx}_${tn}"
     sed -i "s/${dev_item}$/${check_point}/g" "${DEV_FILE}_${domainx}_${tn}"
   done
-  cat /dev/null > "$devs_file"
   while IFS= read -r line
   do
-    topo_name "$line" "$devs_file"
+    topo_name "$line" "$TOPO_FILE"
   done < "${DEV_FILE}_${domainx}_${tn}"
-  cat "$devs_file"
 }
 
 tbt_dev_name()
@@ -677,9 +677,9 @@ topo_tbt_show()
   cat /dev/null > $TOPO_FILE
 
   for domain in ${domains}; do
-    topo_view "$domain" "$t1"
+    #topo_view "$domain" "$t1"
     usb4_view "$domain" "$t1"
-    topo_view "$domain" "$t3"
+    #topo_view "$domain" "$t3"
     usb4_view "$domain" "$t3"
     tbt_dev_name "$domain" "$t1"
     tbt_dev_name "$domain" "$t3"
