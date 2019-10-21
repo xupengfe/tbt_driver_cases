@@ -76,7 +76,7 @@ install_kernel_rpm() {
   loader="/mnt/loader/loader.conf"
 
   echo "umount -f /mnt"
-  umount -f /mnt
+  umount -f /mnt 2>/dev/null
   sleep 1
 
   echo "mount $node /mnt"
