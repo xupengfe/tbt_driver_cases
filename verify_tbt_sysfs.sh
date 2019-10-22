@@ -31,7 +31,8 @@ TBT_DEV_FILE="/tmp/tbt_name.txt"
 TBT_PATH="/sys/bus/thunderbolt/devices"
 REGEX_DEVICE="-"
 REGEX_DOMAIN="domain"
-DEV_FILE="/tmp/tbt_dev.txt"
+DEV_FILE="/tmp/tbt_dev"
+DEV_LIST="/tmp/dev_list"
 #DEVICE_FILES=("authorized" "device" "device_name" "nvm_authenticate" "nvm_version" "uevent" "unique_id" "vendor" "vendor_name")
 export DEVICE_FILES="authorized device device_name link_speed link_width nvm_authenticate nvm_version uevent unique_id vendor vendor_name power/control"
 export POWER_FILES="power/control power/runtime_status power/runtime_enabled"
@@ -594,7 +595,7 @@ usb4_view()
     | grep "${tn}$" \
     | wc -l)
   echo "$domainx-$tn contain $device_num tbt devices."
-  cat /dev/null > $DEV_FILE
+  cat /dev/null > "$DEV_FILE_${domainx}_${tn}"
   for tbt_dev in $tbt_devs; do
     dev_item=""
     dev_item=$(cat $tbt_sys_file | grep "${tbt_dev}$")
@@ -606,13 +607,13 @@ usb4_view()
       | grep -v "${dev_item}$" \
       | grep "${dev_item}")
     [[ -z "$check_point" ]] || continue
-    [[ -z "$dev_item" ]] || echo $dev_item >> $DEV_FILE
+    [[ -z "$dev_item" ]] || echo $dev_item >> "$DEV_FILE_${domainx}_${tn}"
   done
   cat /dev/null > "$devs_file"
   while IFS= read -r line
   do
     topo_name "$line" "$devs_file"
-  done < "$DEV_FILE"
+  done < "$DEV_FILE_${domainx}_${tn}"
   cat "$devs_file"
 }
 
@@ -620,20 +621,29 @@ tbt_dev_name()
 {
   local domainx=$1
   local tn=$2
+  local dev=""
   local tbt_devs=""
   local tbt_dev=""
   local dev_name="device_name"
+  local cp=""
+
+  cat /dev/null > "${DEV_LIST}_${domainx}_${tn}"
+  while IFS= read -r line
+  do
+    for dev in $line; do
+      cp=""
+      cp=$(cat ${DEV_LIST}_${domainx}_${tn} | grep $dev)
+      [[ -z "$cp" ]] || continue
+      [[ "$dev" == "0-0" ]] && continue
+      [[ "$dev" == "1-0" ]] && continue
+      echo "$dev" >> "${DEV_LIST}_${domainx}_${tn}"
+    done
+  done < "$DEV_FILE_${domainx}_${tn}"
 
   # Get tbt dev file in connection order
-  tbt_devs=$(ls ${TBT_PATH} \
-            | grep "^${domainx}" \
-            | grep "${tn}$" \
-            | awk '{ print length(), $0 | "sort -n" }' \
-            | cut -d ' ' -f 2)
-  #tbt_devs=$(ls ${TBT_PATH} \
-  #          | grep "^${domainx}" \
-  #          | grep "${tn}$" \
-  #          | cut -d ' ' -f 2)
+  tbt_devs=""
+  tbt_devs=$(cat ${DEV_LIST}_${domainx}_${tn})
+
   for tbt_dev in $tbt_devs; do
     echo $tbt_dev >> $TBT_DEV_FILE
   done
@@ -656,9 +666,8 @@ topo_tbt_show()
             | grep "$REGEX_DOMAIN" \
             | awk -F "$REGEX_DOMAIN" '{print $2}' \
             | awk -F "->" '{print $1}')
-
+  cat /dev/null > "$TBT_DEV_FILE"
   cat /dev/null > $TOPO_FILE
-  cat /dev/null > $TBT_DEV_FILE
 
   for domain in ${domains}; do
     topo_view "$domain" "$t1"
@@ -673,7 +682,6 @@ topo_tbt_show()
     echo "tbt $TOPO_FILE is null:$topo_result!!!"
     exit 2
   }
-  #cat $TBT_DEV_FILE
 }
 
 tbt_main()
