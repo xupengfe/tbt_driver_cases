@@ -473,15 +473,15 @@ topo_view()
             | tr '/' ' ')
 
   [ -n "$tbt_sys" ] || {
-    echo "No tbt device in $domainx-$tn!"
+    #echo "No tbt device in $domainx-$tn!"
     return 1
   }
 
   # Get last file
   last=$(echo $tbt_sys | awk '{print $NF}')
   device_num=$(echo $tbt_sys | awk '{print NF-1}')
-  echo "$domainx-$tn contain $device_num tbt devices:"
-  echo "$domainx-$tn contain $device_num tbt devices:" >> $TOPO_FILE
+  #echo "$domainx-$tn contain $device_num tbt devices."
+  #echo "$domainx-$tn contain $device_num tbt devices." >> $TOPO_FILE
 
   # Last file not add <-> in the end
   for tbt_file in ${tbt_sys}; do
@@ -510,10 +510,58 @@ topo_view()
       fi
     fi
   done
-  echo "device_topo: $device_topo"
+  #echo "device_topo: $device_topo"
   echo "device_topo: $device_topo" >> $TOPO_FILE
-  echo "file_topo  : $file_topo"
+  #echo "file_topo  : $file_topo"
   echo "file_topo  : $file_topo" >> $TOPO_FILE
+}
+
+topo_name()
+{
+  local tbt_sys=$1
+  local devs_file=$2
+  local tbt_file=""
+  local dev_name="device_name"
+  local device_topo=""
+  local file_topo=""
+
+  [ -n "$tbt_sys" ] || {
+    echo "No tbt device in tbt_sys:$tbt_sys"
+    return 1
+  }
+
+  # Get last file
+  last=$(echo $tbt_sys | awk '{print $NF}')
+
+  # Last file not add <-> in the end
+  for tbt_file in ${tbt_sys}; do
+    device_file=""
+    if [ "$tbt_file" == "$last" ]; then
+      device_file=$(cat ${TBT_PATH}/${tbt_file}/${dev_name} 2>/dev/null)
+      device_topo=${device_topo}${device_file}
+      file_topo=${file_topo}${tbt_file}
+    else
+      device_file=$(cat ${TBT_PATH}/${tbt_file}/${dev_name} 2>/dev/null)
+      [[ -n "$device_file" ]] || device_file="no_name"
+      # For alignment for such as 0-0 and device name, device name is longer
+      device_file_num=${#device_file}
+      tbt_file_num=${#tbt_file}
+      if [ $device_file_num -gt $tbt_file_num ]; then
+        gap=$((device_file_num - tbt_file_num))
+        device_topo=${device_topo}${device_file}" <-> "
+        file_topo=${file_topo}${tbt_file}
+        for ((c=1; c<=gap; c++)); do
+          file_topo=${file_topo}" "
+        done
+        file_topo=${file_topo}" <-> "
+      else
+        device_topo=${device_topo}${device_file}" <-> "
+        file_topo=${file_topo}${tbt_file}" <-> "
+      fi
+    fi
+  done
+  echo "device_topo: $device_topo" >> $devs_file
+  echo "file_topo  : $file_topo" >> $devs_file
 }
 
 usb4_view()
@@ -527,6 +575,7 @@ usb4_view()
   local dev_file="/tmp/tbt_dev.txt"
   local dev_item=""
   local check_point=""
+  local devs_file="/tmp/tbt_view.txt"
 
   ls -l ${TBT_PATH}/${domainx}*${tn} 2>/dev/null \
     | grep "-" \
@@ -545,7 +594,7 @@ usb4_view()
     | grep "^${domainx}" \
     | grep "${tn}$" \
     | wc -l)
-  echo "$domainx-$tn contain $device_num tbt devices:"
+  echo "$domainx-$tn contain $device_num tbt devices."
   cat /dev/null > $dev_file
   for tbt_dev in $tbt_devs; do
     dev_item=""
@@ -560,8 +609,12 @@ usb4_view()
     [[ -z "$check_point" ]] || continue
     [[ -z "$dev_item" ]] || echo $dev_item >> $dev_file 
   done
-  echo "dev_file:$dev_file"
-  cat $dev_file
+  cat /dev/null > "$devs_file"
+  while IFS= read -r line
+  do
+    topo_name "$line" "$devs_file"
+  done < "$dev_file"
+  cat "$devs_file"
 }
 
 tbt_dev_name()
@@ -573,12 +626,11 @@ tbt_dev_name()
   local dev_name="device_name"
 
   # Get tbt dev file in connection order
-  tbt_devs=$(ls -l ${TBT_PATH}/${domainx}*${tn} 2>/dev/null \
-            | grep "-" \
+  tbt_devs=$(ls ${TBT_PATH} \
+            | grep "^${domainx}" \
+            | grep "${tn}$" \
             | awk '{ print length(), $0 | "sort -n" }' \
-            | tail -n 1 \
-            | awk -F "${domainx}-0/" '{print $2}' \
-            | tr '/' ' ')
+            | cut -d ' ' -f 2)
   for tbt_dev in $tbt_devs; do
     echo $tbt_dev >> $TBT_DEV_FILE
   done
