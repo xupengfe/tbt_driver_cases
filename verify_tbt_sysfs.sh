@@ -31,6 +31,7 @@ TBT_DEV_FILE="/tmp/tbt_name.txt"
 TBT_PATH="/sys/bus/thunderbolt/devices"
 REGEX_DEVICE="-"
 REGEX_DOMAIN="domain"
+DEV_FILE="/tmp/tbt_dev.txt"
 #DEVICE_FILES=("authorized" "device" "device_name" "nvm_authenticate" "nvm_version" "uevent" "unique_id" "vendor" "vendor_name")
 export DEVICE_FILES="authorized device device_name link_speed link_width nvm_authenticate nvm_version uevent unique_id vendor vendor_name power/control"
 export POWER_FILES="power/control power/runtime_status power/runtime_enabled"
@@ -572,7 +573,6 @@ usb4_view()
   local tbt_sys_file="/tmp/tbt_sys.txt"
   local tbt_devs=""
   local device_num=""
-  local dev_file="/tmp/tbt_dev.txt"
   local dev_item=""
   local check_point=""
   local devs_file="/tmp/tbt_view.txt"
@@ -588,14 +588,13 @@ usb4_view()
   tbt_devs=$(ls ${TBT_PATH} \
     | grep "^${domainx}" \
     | grep "${tn}$" \
-    | awk '{ print length(), $0 | "sort -n" }' \
     | cut -d ' ' -f 2)
   device_num=$(ls ${TBT_PATH} \
     | grep "^${domainx}" \
     | grep "${tn}$" \
     | wc -l)
   echo "$domainx-$tn contain $device_num tbt devices."
-  cat /dev/null > $dev_file
+  cat /dev/null > $DEV_FILE
   for tbt_dev in $tbt_devs; do
     dev_item=""
     dev_item=$(cat $tbt_sys_file | grep "${tbt_dev}$")
@@ -607,13 +606,13 @@ usb4_view()
       | grep -v "${dev_item}$" \
       | grep "${dev_item}")
     [[ -z "$check_point" ]] || continue
-    [[ -z "$dev_item" ]] || echo $dev_item >> $dev_file 
+    [[ -z "$dev_item" ]] || echo $dev_item >> $DEV_FILE
   done
   cat /dev/null > "$devs_file"
   while IFS= read -r line
   do
     topo_name "$line" "$devs_file"
-  done < "$dev_file"
+  done < "$DEV_FILE"
   cat "$devs_file"
 }
 
@@ -631,6 +630,10 @@ tbt_dev_name()
             | grep "${tn}$" \
             | awk '{ print length(), $0 | "sort -n" }' \
             | cut -d ' ' -f 2)
+  #tbt_devs=$(ls ${TBT_PATH} \
+  #          | grep "^${domainx}" \
+  #          | grep "${tn}$" \
+  #          | cut -d ' ' -f 2)
   for tbt_dev in $tbt_devs; do
     echo $tbt_dev >> $TBT_DEV_FILE
   done
