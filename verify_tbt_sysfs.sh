@@ -592,7 +592,7 @@ usb4_view()
     | grep "^${domainx}" \
     | grep "${tn}$" \
     | wc -l)
-  echo "$domainx-$tn contain $device_num tbt devices."
+  echo "$domainx-$tn contains $device_num tbt devices."
   cat /dev/null > "$DEV_FILE_${domainx}_${tn}"
   for tbt_dev in $tbt_devs; do
     dev_item=""
