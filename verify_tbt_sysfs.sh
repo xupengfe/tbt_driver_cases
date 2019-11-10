@@ -516,6 +516,54 @@ topo_view()
   echo "file_topo  : $file_topo" >> $TOPO_FILE
 }
 
+usb4_view()
+{
+  local domainx=$1
+  local tn=$2
+  local tbt_sys_content=""
+  local tbt_sys_file="/tmp/tbt_sys.txt"
+  local tbt_devs=""
+  local device_num=""
+  local dev_file="/tmp/tbt_dev.txt"
+  local dev_item=""
+  local check_point=""
+
+  ls -l ${TBT_PATH}/${domainx}*${tn} 2>/dev/null \
+    | grep "-" \
+    | awk '{ print length(), $0 | "sort -n" }' \
+    | awk -F "${REGEX_DOMAIN}${domainx}/" '{print $2}' \
+    | tr '/' ' ' \
+    > $tbt_sys_file
+  tbt_sys_content=$(cat $tbt_sys_file)
+
+  tbt_devs=$(ls ${TBT_PATH} \
+    | grep "^${domainx}" \
+    | grep "${tn}$" \
+    | awk '{ print length(), $0 | "sort -n" }' \
+    | cut -d ' ' -f 2)
+  device_num=$(ls ${TBT_PATH} \
+    | grep "^${domainx}" \
+    | grep "${tn}$" \
+    | wc -l)
+  echo "$domainx-$tn contain $device_num tbt devices:"
+  cat /dev/null > $dev_file
+  for tbt_dev in $tbt_devs; do
+    dev_item=""
+    dev_item=$(cat $tbt_sys_file | grep "${tbt_dev}$")
+    [[ -z "$dev_item" ]] && {
+      echo "WARN:dev_item is null for tbt_dev:$tbt_dev"
+      continue
+    }
+    check_point=$(cat $tbt_sys_file \
+      | grep -v "${dev_item}$" \
+      | grep "${dev_item}")
+    [[ -z "$check_point" ]] || continue
+    [[ -z "$dev_item" ]] || echo $dev_item >> $dev_file 
+  done
+  echo "dev_file:$dev_file"
+  cat $dev_file
+}
+
 tbt_dev_name()
 {
   local domainx=$1
@@ -559,7 +607,9 @@ topo_tbt_show()
 
   for domain in ${domains}; do
     topo_view "$domain" "$t1"
+    usb4_view "$domain" "$t1"
     topo_view "$domain" "$t3"
+    usb4_view "$domain" "$t3"
     tbt_dev_name "$domain" "$t1"
     tbt_dev_name "$domain" "$t3"
   done
