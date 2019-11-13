@@ -21,6 +21,27 @@ usage() {
 __EOF
 }
 
+set_crond()
+{
+  local crond_service="/etc/systemd/system/crond.service"
+ 
+  echo "[Service]" > $crond_service
+  echo "Type=simple" >> $crond_service
+  echo "ExecStart=/usr/bin/crond -n" >> $crond_service
+  echo "[Install]" >> $crond_service
+  echo "WantedBy=multi-user.target graphical.target" >> $crond_service
+  
+  sleep 1
+  
+  systemctl daemon-reload
+  systemctl enable crond
+  systemctl start crond
+
+  echo "systemctl status crond"  
+  systemctl status crond
+  echo "crond service is done:$crond_service"
+}
+
 update_intel_next()
 {
 script_path=$(pwd)
@@ -46,9 +67,13 @@ echo "$time: $code_path git fetch origin result:$?"
 echo "$time: $code_path git fetch origin result:$?" >> $log_path
 }
 
-while getopts h arg
+while getopts ch arg
 do
   case $arg in
+    c)
+      set_crond
+      exit 0
+      ;;
     h)
       usage && exit 0
       ;;
