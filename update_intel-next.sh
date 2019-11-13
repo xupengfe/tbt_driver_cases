@@ -13,12 +13,13 @@ result=""
 
 usage() {
   cat <<__EOF
-	    usage: ./${0##*/} [-h]
+	    usage: ./${0##*/} [NA][-c][-h]
+  NA  No parameter, it will update otc_intel_next-linux once
   -c  set up auto run environment in Clear Linux
   -h  show This
-  set intel-next code path into $path_file
-  crontab -e
-  30 08 * * * $script_path/update_intel-next.sh //it will be executed 08:30 every day.
+    set intel-next code path into $path_file
+    crontab -e
+    30 08 * * * $script_path/update_intel-next.sh //it will be executed 08:30 every day.
 __EOF
 }
 
