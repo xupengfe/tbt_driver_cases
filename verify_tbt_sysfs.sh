@@ -533,7 +533,7 @@ topo_name()
   }
 
   # Get last file
-  last=$(echo $tbt_sys | awk '{print $NF}')
+  last=$(echo "$tbt_sys" | awk '{print $NF}')
 
   # Last file not add <-> in the end
   for tbt_file in ${tbt_sys}; do
@@ -548,7 +548,7 @@ topo_name()
       # For alignment for such as 0-0 and device name, device name is longer
       device_file_num=${#device_file}
       tbt_file_num=${#tbt_file}
-      if [ $device_file_num -gt $tbt_file_num ]; then
+      if [[ "$device_file_num" -gt "$tbt_file_num" ]]; then
         gap=$((device_file_num - tbt_file_num))
         device_topo=${device_topo}${device_file}" <-> "
         file_topo=${file_topo}${tbt_file}
@@ -562,15 +562,14 @@ topo_name()
       fi
     fi
   done
-  echo "device_topo: $device_topo" >> $devs_file
-  echo "file_topo  : $file_topo" >> $devs_file
+  echo "device_topo: $device_topo" >> "$devs_file"
+  echo "file_topo  : $file_topo" >> "$devs_file"
 }
 
 usb4_view()
 {
   local domainx=$1
   local tn=$2
-  local tbt_sys_content=""
   local tbt_sys_file="/tmp/tbt_sys.txt"
   local tbt_devs=""
   local device_num=""
@@ -584,7 +583,6 @@ usb4_view()
     | awk -F "${REGEX_DOMAIN}${domainx}/" '{print $2}' \
     | tr '/' ' ' \
     > $tbt_sys_file
-  tbt_sys_content=$(cat $tbt_sys_file)
 
   tbt_devs=$(ls ${TBT_PATH} \
     | grep "^${domainx}" \
@@ -607,7 +605,7 @@ usb4_view()
       | grep -v "${dev_item}$" \
       | grep "${dev_item}")
     [[ -z "$check_point" ]] || continue
-    [[ -z "$dev_item" ]] || echo $dev_item >> "$DEV_FILE_${domainx}_${tn}"
+    [[ -z "$dev_item" ]] || echo "$dev_item" >> "$DEV_FILE_${domainx}_${tn}"
   done
   cat /dev/null > "$devs_file"
   while IFS= read -r line
@@ -632,7 +630,7 @@ tbt_dev_name()
   do
     for dev in $line; do
       cp=""
-      cp=$(cat ${DEV_LIST}_${domainx}_${tn} | grep $dev)
+      cp=$(cat ${DEV_LIST}_${domainx}_${tn} | grep "$dev")
       [[ -z "$cp" ]] || continue
       [[ "$dev" == "0-0" ]] && continue
       [[ "$dev" == "1-0" ]] && continue
@@ -645,7 +643,7 @@ tbt_dev_name()
   tbt_devs=$(cat ${DEV_LIST}_${domainx}_${tn})
 
   for tbt_dev in $tbt_devs; do
-    echo $tbt_dev >> $TBT_DEV_FILE
+    echo "$tbt_dev" >> "$TBT_DEV_FILE"
   done
 }
 
