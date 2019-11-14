@@ -57,16 +57,16 @@ fi
 [[ -n "$code_path" ]] || code_path="$default_path"
 
 if [[ -d "$code_path" ]]; then
-  cd $code_path
+  cd $code_path || exit 1
 else
   echo "There was no directory: $code_path"
   echo "$time: there was no directory: $code_path" >> $log_path
   exit 1
 fi
-git fetch origin
+git fetch origin -f
 result="$?"
-echo "$time: $code_path git fetch origin result:$?"
-echo "$time: $code_path git fetch origin result:$?" >> $log_path
+echo "$time: $code_path git fetch origin result:$result"
+echo "$time: $code_path git fetch origin result:$result" >> $log_path
 }
 
 while getopts ch arg
