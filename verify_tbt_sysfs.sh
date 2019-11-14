@@ -579,21 +579,25 @@ usb4_view()
 
   ls -l ${TBT_PATH}/${domainx}*${tn} 2>/dev/null \
     | grep "-" \
-    | awk '{ print length(), $0 | "sort -n" }' \
     | awk -F "${REGEX_DOMAIN}${domainx}/" '{print $2}' \
+    | awk '{ print length(), $0 | "sort -n" }' \
+    | cut -d ' ' -f 2 \
     | tr '/' ' ' \
     > $tbt_sys_file
-
-  tbt_devs=$(ls ${TBT_PATH} \
+  # need tbt devices in order
+  tbt_devs=$(ls ${TBT_PATH} 2>/dev/null \
+    | grep "-" \
     | grep "^${domainx}" \
     | grep "${tn}$" \
+    | awk '{ print length(), $0 | "sort -n" }' \
     | cut -d ' ' -f 2)
   device_num=$(ls ${TBT_PATH} \
     | grep "^${domainx}" \
     | grep "${tn}$" \
     | wc -l)
   echo "$domainx-$tn contains $device_num tbt devices."
-  cat /dev/null > "$DEV_FILE_${domainx}_${tn}"
+  cat /dev/null > "${DEV_FILE}_${domainx}_${tn}"
+  cp -rf "$tbt_sys_file" "${DEV_FILE}_${domainx}_${tn}"
   for tbt_dev in $tbt_devs; do
     dev_item=""
     dev_item=$(cat $tbt_sys_file | grep "${tbt_dev}$")
@@ -601,17 +605,22 @@ usb4_view()
       echo "WARN:dev_item is null for tbt_dev:$tbt_dev"
       continue
     }
-    check_point=$(cat $tbt_sys_file \
+    check_point=$(cat "$tbt_sys_file" \
       | grep -v "${dev_item}$" \
-      | grep "${dev_item}")
-    [[ -z "$check_point" ]] || continue
-    [[ -z "$dev_item" ]] || echo "$dev_item" >> "$DEV_FILE_${domainx}_${tn}"
+      | grep "${dev_item}" \
+      | head -n 1)
+    [[ -z "$check_point" ]] && {
+      #echo "check_point for ${dev_item} is null"
+      continue
+    }
+    sed -i "/${check_point}$/d" "${DEV_FILE}_${domainx}_${tn}"
+    sed -i "s/${dev_item}$/${check_point}/g" "${DEV_FILE}_${domainx}_${tn}"
   done
   cat /dev/null > "$devs_file"
   while IFS= read -r line
   do
     topo_name "$line" "$devs_file"
-  done < "$DEV_FILE_${domainx}_${tn}"
+  done < "${DEV_FILE}_${domainx}_${tn}"
   cat "$devs_file"
 }
 
@@ -636,7 +645,7 @@ tbt_dev_name()
       [[ "$dev" == "1-0" ]] && continue
       echo "$dev" >> "${DEV_LIST}_${domainx}_${tn}"
     done
-  done < "$DEV_FILE_${domainx}_${tn}"
+  done < "${DEV_FILE}_${domainx}_${tn}"
 
   # Get tbt dev file in connection order
   tbt_devs=""
