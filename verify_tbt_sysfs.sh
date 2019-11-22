@@ -641,8 +641,7 @@ tbt_dev_name()
       cp=""
       cp=$(cat ${DEV_LIST}_${domainx}_${tn} | grep "$dev")
       [[ -z "$cp" ]] || continue
-      [[ "$dev" == "0-0" ]] && continue
-      [[ "$dev" == "1-0" ]] && continue
+      [[ "$dev" == *"-0" ]] && continue
       echo "$dev" >> "${DEV_LIST}_${domainx}_${tn}"
     done
   done < "${DEV_FILE}_${domainx}_${tn}"
