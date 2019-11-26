@@ -51,7 +51,7 @@ DEV_PCI=""
 TBT_DEV_NAME=""
 STUFF_FILE="/tmp/tbt_stuff.txt"
 TBT_STUFF_LIST="/tmp/tbt_stuff_list.txt"
-PLATFORM=""
+PF_BIOS=""
 TBT_NUM=""
 ROOT_PCI=""
 
@@ -110,18 +110,18 @@ tbt_us_pci()
   cat /dev/null > $PCI_HEX_FILE
   cat /dev/null > $PCI_DEC_FILE
   for pci in $pcis; do
-    pci_ds=""
+    pci_us=""
     PCI_HEX=""
     PCI_DEC=""
-    pci_content=$(ls -ltra $PCI_PATH/$pci)
+    pci_content=$(ls -ltra "$PCI_PATH"/"$pci")
     [[ "$pci_content" == *"$ROOT_PCI"* ]] || continue
 
-    pci_us=$(lspci -v -s $pci | grep -i upstream)
+    pci_us=$(lspci -v -s "$pci" | grep -i upstream)
     if [[ -z "$pci_us" ]]; then
       continue
     else
       #echo "Upstream pci:$pci"
-      PCI_HEX=$(echo $pci | cut -d ':' -f 2)
+      PCI_HEX=$(echo "$pci" | cut -d ':' -f 2)
       PCI_DEC=$((0x"$PCI_HEX"))
       # Due to ICL tbt driver PCI 00:0d.2 and 00:0d.3
       # ICL no impact, due to ICL dr pci is 00
@@ -129,8 +129,8 @@ tbt_us_pci()
         #echo "$PCI_DEC not greater than 3, skip"
         continue
       }
-      echo $PCI_HEX >> $PCI_HEX_FILE
-      echo $PCI_DEC >> $PCI_DEC_FILE
+      echo "$PCI_HEX" >> $PCI_HEX_FILE
+      echo "$PCI_DEC" >> $PCI_DEC_FILE
     fi
   done
   #echo "TBT device upstream PCI in hex:"
@@ -142,28 +142,30 @@ tbt_us_pci()
 find_root_pci()
 {
   local tbt_devs=""
-  local pf_name=$(dmidecode --type bios \
+  local pf_name=""
+
+  pf_name=$(dmidecode --type bios \
                  | grep Version \
-                 | cut -d ':' -f 2)
+                 | cut -d ':' -f 2 \
+                 | cut -d '.' -f 1)
   #local pf_name=$(dmidecode | grep "ICL")
 
   case $pf_name in
     *ICL*)
-      echo "ICL platform"
-      PLATFORM="ICL"
+      PF_BIOS="ICL"
       ROOT_PCI="00:07"
       ;;
     *TGL*)
-      echo "TGL platform"
-      PLATFORM="TGL"
+      PF_BIOS="TGL"
       ROOT_PCI="00:07"
       ;;
     *)
+     PF_BIOS="$pf_name"
      ROOT_PCI=$(udevadm info --attribute-walk --path=/sys/bus/thunderbolt/devices/0-0 | grep KERNEL | tail -n 2 | grep -v pci0000 | cut -d "\"" -f 2)
      #ROOT_PCI="0000:03:00.0"
      ;;
   esac
-  #echo "ROOT_PCI:$ROOT_PCI"
+  echo "PF_BIOS:$PF_BIOS platform, ROOT_PCI:$ROOT_PCI"
 }
 
 enable_authorized()
@@ -318,7 +320,7 @@ check_32bytes_key()
 
   if [ -e "$key_file" ]; then
     test_print_trc "$key_file already exist"
-    key_content=$(cat ${key_file})
+    key_content=$(cat "$key_file")
     key_len=${#key_content}
     if [ "$key_len" -eq "$key_number" ]; then
       test_print_trc "$key_file lenth is 64, ok"
@@ -326,12 +328,12 @@ check_32bytes_key()
     else
       test_print_trc "$key_file lenth is not 64:$key_content"
       test_print_trc "Key lenth wrong, regenerate $key_file"
-      openssl rand -hex 32 > $key_file
+      openssl rand -hex 32 > "$key_file"
       return 2
     fi
   else
     test_print_trc "No key file, generate $key_file"
-    openssl rand -hex 32 > $key_file
+    openssl rand -hex 32 > "$key_file"
     return 1
   fi
 }
@@ -435,7 +437,7 @@ secure_mode_test()
       test_print_trc "$i round set 2 to authorized for secure mode:"
       for aim_folder in ${aim_folders}; do
         verify_key_file "$aim_folder"
-        if [ $? -ne 0 ]; then
+        if [[ "$?" -ne 0 ]]; then
           test_print_trc "Action result abnormal, please check the detail log"
         fi
       done
@@ -480,8 +482,8 @@ topo_view()
   }
 
   # Get last file
-  last=$(echo $tbt_sys | awk '{print $NF}')
-  device_num=$(echo $tbt_sys | awk '{print NF-1}')
+  last=$(echo "$tbt_sys" | awk '{print $NF}')
+  device_num=$(echo "$tbt_sys" | awk '{print NF-1}')
   #echo "$domainx-$tn contain $device_num tbt devices."
   #echo "$domainx-$tn contain $device_num tbt devices." >> $TOPO_FILE
 
@@ -498,7 +500,7 @@ topo_view()
       # For alignment for such as 0-0 and device name, device name is longer
       device_file_num=${#device_file}
       tbt_file_num=${#tbt_file}
-      if [ $device_file_num -gt $tbt_file_num ]; then
+      if [[ "$device_file_num" -gt "$tbt_file_num" ]]; then
         gap=$((device_file_num - tbt_file_num))
         device_topo=${device_topo}${device_file}" <-> "
         file_topo=${file_topo}${tbt_file}
@@ -602,7 +604,7 @@ usb4_view()
   cp -rf "$tbt_sys_file" "${DEV_FILE}_${domainx}_${tn}"
   for tbt_dev in $tbt_devs; do
     dev_item=""
-    dev_item=$(cat $tbt_sys_file | grep "${tbt_dev}$")
+    dev_item=$(cat "$tbt_sys_file" | grep "${tbt_dev}$")
     [[ -z "$dev_item" ]] && {
       echo "WARN:dev_item is null for tbt_dev:$tbt_dev"
       continue
@@ -871,7 +873,7 @@ find_tbt_dev_stuff()
   }
   for dev_node in $dev_nodes; do
     dev_under_tbt "$dev_node"
-    [[ $? -eq 0 ]] || continue
+    [[ "$?" -eq 0 ]] || continue
   done
   list_tbt_stuff
 }
