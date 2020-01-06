@@ -47,6 +47,5 @@ TBT_XS_FUNC_S4_TBT_TEST tbt_func_test.sh -s suspend -t disk -p tbt
 TBT_XS_FUNC_S4_SSD_RW tbt_func_test.sh -s suspend -t disk -p ssd
 TBT_XS_FUNC_S4_MONITOR_TEST tbt_func_test.sh -s suspend -t disk -p monitor
 TBT_XS_FUNC_RTD3_HOST_D3
-TBT_XS_FUNC_SWCM_VERIFY_TEST tbt_func_test.sh -s swcm_verify
 TBT_XS_FUNC_VTD_ENABLE_TEST tbt_func_test.sh -s vtd_enable
 TBT_XS_FUNC_VTD_IOMMU_VERIFY tbt_func_test.sh -s iommu_verify

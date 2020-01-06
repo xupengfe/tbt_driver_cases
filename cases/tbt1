@@ -35,6 +35,5 @@ TBT_XS_FUNC_ADM_ACL tbt_tools.sh -s adm_acl
 TBT_XS_FUNC_ADM_RM_FIRST tbt_tools.sh -s adm_remove_first
 TBT_XS_FUNC_ADM_RM_ALL tbt_tools.sh -s adm_remove_all
 TBT_XS_FUNC_RTD3_HOST_D3
-TBT_XS_FUNC_SWCM_VERIFY_TEST tbt_func_test.sh -s swcm_verify
 TBT_XS_FUNC_VTD_ENABLE_TEST tbt_func_test.sh -s vtd_enable
 TBT_XS_FUNC_VTD_IOMMU_VERIFY tbt_func_test.sh -s iommu_verify
