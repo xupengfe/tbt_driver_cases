@@ -1,0 +1,12 @@
+TBT_XS_FUNC_FREEZE_TBT_TEST tbt_func_test.sh -s suspend -t freeze -p tbt
+TBT_XS_FUNC_FREEZE_SSD_RW tbt_func_test.sh -s suspend -t freeze -p ssd
+TBT_XS_FUNC_FREEZE_MONITOR_TEST tbt_func_test.sh -s suspend -t freeze -p monitor
+TBT_XS_FUNC_S2IDLE_TBT_TEST tbt_func_test.sh -s suspend -t s2idle -p tbt
+TBT_XS_FUNC_S2IDLE_SSD_RW tbt_func_test.sh -s suspend -t s2idle -p ssd
+TBT_XS_FUNC_S2IDLE_MONITOR_TEST tbt_func_test.sh -s suspend -t s2idle -p monitor
+TBT_XS_FUNC_S3_TBT_TEST tbt_func_test.sh -s suspend -t deep -p tbt
+TBT_XS_FUNC_S3_SSD_RW tbt_func_test.sh -s suspend -t deep -p ssd
+TBT_XS_FUNC_S3_MONITOR_TEST tbt_func_test.sh -s suspend -t deep -p monitor
+TBT_XS_FUNC_S4_TBT_TEST tbt_func_test.sh -s suspend -t disk -p tbt
+TBT_XS_FUNC_S4_SSD_RW tbt_func_test.sh -s suspend -t disk -p ssd
+TBT_XS_FUNC_S4_MONITOR_TEST tbt_func_test.sh -s suspend -t disk -p monitor

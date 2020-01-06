@@ -1,0 +1,3 @@
+TBT_XS_FUNC_S2IDLE_TBT_TEST tbt_func_test.sh -s suspend -t s2idle -p tbt
+TBT_XS_FUNC_S3_TBT_TEST tbt_func_test.sh -s suspend -t deep -p tbt
+TBT_XS_FUNC_S4_TBT_TEST tbt_func_test.sh -s suspend -t disk -p tbt
