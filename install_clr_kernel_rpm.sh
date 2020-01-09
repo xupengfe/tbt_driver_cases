@@ -22,6 +22,7 @@ print_log() {
 install_kernel_rpm() {
   local rpm_name=$1
   local build=""
+  local result=""
 
   if [[ -n "$rpm_name" ]]; then
     build=$rpm_name
@@ -105,10 +106,17 @@ install_kernel_rpm() {
     print_log "install $build with default successfully"
     exit 0
   }
-  echo "sed -i s/$default/default linux-$module/g $loader"
-  sed -i s/"$default"/"default linux-$module"/g $loader
-  echo "install $build successfully"
   print_log "install $build successfully"
+  echo "sed -i s/$default/default linux-$module/g $loader"
+  sed -i s/"$default"/"default linux-$module"/g $loader \
+    || print_log "sed -i step return $?"
+  result=$(cat $loader | grep $module)
+  [[ -z "$result" ]] && {
+    print_log "Change $loader to linux-$module failed! Please change it manually!"
+    print_log "Please contact with pengfei.xu@intel.com for this faiulre, thanks!"
+    return 1
+  }
+  echo "install $build successfully!"
 }
 
 install_kernel_rpm "$RPM_NAME"
