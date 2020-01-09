@@ -117,6 +117,7 @@ install_kernel_rpm() {
     return 1
   }
   echo "install $build successfully!"
+  echo "install record is located in $INSTALL_LOG"
 }
 
 install_kernel_rpm "$RPM_NAME"
