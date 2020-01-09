@@ -1,0 +1,8 @@
+{
+    "package_root": "/home/202001060916",
+    "executor": "xupengfe",
+    "platform": "tgl-u",
+    "branch": "intel-next_clr",
+    "environment": "Lab",
+    "kernel": "v5.5-rc4"
+}
