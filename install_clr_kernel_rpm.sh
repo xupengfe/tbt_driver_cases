@@ -114,7 +114,7 @@ install_kernel_rpm() {
   [[ -z "$result" ]] && {
     print_log "Change $loader to linux-$module failed! Please change it manually!"
     print_log "Please contact with pengfei.xu@intel.com for this faiulre, thanks!"
-    return 1
+    exit 1
   }
   echo "install $build successfully!"
   echo "install record is located in $INSTALL_LOG"
