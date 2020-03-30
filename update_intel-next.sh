@@ -6,6 +6,7 @@
 log_path="/root/update_intel-next.log"
 path_file="/root/path"
 code_path=""
+code_paths=""
 time=$(date +%Y-%m-%d_%H:%M)
 script_path=$(pwd)
 default_path="/root/otc_intel_next-linux"
@@ -48,25 +49,26 @@ update_intel_next()
 {
 script_path=$(pwd)
 if [[ -e "$path_file" ]]; then
-  code_path=$(cat $path_file | head -n 1)
+  code_paths=$(cat $path_file)
 else
   echo "set intel-next code path into $path_file"
-  echo "set $default_path as default in code_path"
+  echo "set $default_path as default in code_paths"
+  code_paths="$default_path"
 fi
 
-[[ -n "$code_path" ]] || code_path="$default_path"
-
-if [[ -d "$code_path" ]]; then
-  cd $code_path || exit 1
-else
-  echo "There was no directory: $code_path"
-  echo "$time: there was no directory: $code_path" >> $log_path
-  exit 1
-fi
-git fetch origin -f
-result="$?"
-echo "$time: $code_path git fetch origin result:$result"
-echo "$time: $code_path git fetch origin result:$result" >> $log_path
+for code_path in $code_paths; do
+  if [[ -d "$code_path" ]]; then
+    cd $code_path || return 1
+  else
+    echo "There was no directory: $code_path"
+    echo "$time: there was no directory: $code_path" >> $log_path
+    return 1
+  fi
+  git fetch origin -f
+  result="$?"
+  echo "$time: $code_path git fetch origin result:$result"
+  echo "$time: $code_path git fetch origin result:$result" >> $log_path
+done
 }
 
 while getopts ch arg
