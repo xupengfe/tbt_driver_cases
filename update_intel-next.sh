@@ -64,7 +64,7 @@ for code_path in $code_paths; do
     echo "$time: there was no directory: $code_path" >> $log_path
     return 1
   fi
-  sudo git fetch origin -f
+  sudo git fetch origin -f 2>> $log_path
   result="$?"
   echo "$time: $code_path git fetch origin result:$result"
   echo "$time: $code_path git fetch origin result:$result" >> $log_path
