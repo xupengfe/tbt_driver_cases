@@ -21,6 +21,7 @@ err_feedback() {
 print_log() {
   local log_info=$1
 
+  echo "$log_info"
   echo "$DATE: $log_info" >> $INSTALL_LOG
 }
 
