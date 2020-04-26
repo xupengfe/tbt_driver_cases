@@ -13,6 +13,11 @@ usage() {
 __EOF
 }
 
+err_feedback() {
+    print_log "Please contact with pengfei.xu@intel.com for this faiulre, thanks!"
+    exit 1
+}
+
 print_log() {
   local log_info=$1
 
@@ -23,6 +28,8 @@ install_kernel_rpm() {
   local rpm_name=$1
   local build=""
   local result=""
+  local loader="/mnt/loader/loader.conf"
+  local swap_node=""
 
   if [[ -n "$rpm_name" ]]; then
     build=$rpm_name
@@ -74,22 +81,33 @@ install_kernel_rpm() {
   cp -rf $config /lib/kernel/
 
   node=$(fdisk -l  \
-        | grep -C5 root \
         | grep -i EFI \
-        | head -n 1 \
         | cut -d ' ' -f 1)
-  [[ -n "$node" ]] || node=$(fdisk -l \
-                            | grep -i EFI \
-                            | head -n 1 \
-                            | cut -d ' ' -f 1)
-  loader="/mnt/loader/loader.conf"
+  [[ -n "$node" ]] || {
+    echo "could not find EFI node:$node!"
+    err_feedback
+  }
+  node_num=$(fdisk -l  \
+            | grep -i EFI \
+            | cut -d ' ' -f 1 \
+            | wc -l)
+  [[ "$node_num" -gt 1 ]] && {
+    echo "WARN:Found $node_num nodes:$node"
+    swap_node=$(cat /proc/swaps \
+              | grep dev \
+              | cut -d ' ' -f 1 \
+              | sed s'/.$//')\
+    echo "swap_node:$swap_node"
+    node=$(echo "$node" | grep "$swap_node")
+    echo "After auto check, boot EFI node:$node"
+  }
 
   echo "umount -f /mnt"
   umount -f /mnt 2>/dev/null
   sleep 1
 
   echo "mount $node /mnt"
-  mount $node /mnt
+  mount "$node" /mnt
   [[ -e "$loader" ]] || {
     echo "no $loader file"
     print_log "no $loader file, failed"
@@ -113,8 +131,7 @@ install_kernel_rpm() {
   result=$(cat $loader | grep $module)
   [[ -z "$result" ]] && {
     print_log "Change $loader to linux-$module failed! Please change it manually!"
-    print_log "Please contact with pengfei.xu@intel.com for this faiulre, thanks!"
-    exit 1
+    err_feedback
   }
   echo "install $build successfully!"
   echo "install record is located in $INSTALL_LOG"
