@@ -140,7 +140,9 @@ install_kernel_rpm() {
     print_log "Change $loader to linux-$module failed! Please change it manually!"
     err_feedback
   }
+  default=$(cat $loader | grep default | head -n 1)
   echo "install $build successfully!"
+  print_log "$loader:$default"
   echo "install record is located in $INSTALL_LOG"
 }
 
