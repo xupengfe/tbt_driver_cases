@@ -31,6 +31,11 @@ install_kernel_rpm() {
   local loader="/mnt/loader/loader.conf"
   local swap_node=""
 
+  swap_node=$(cat /proc/swaps \
+            | grep dev \
+            | cut -d ' ' -f 1 \
+            | sed s'/.$//')
+
   if [[ -n "$rpm_name" ]]; then
     build=$rpm_name
   else
@@ -92,14 +97,15 @@ install_kernel_rpm() {
             | cut -d ' ' -f 1 \
             | wc -l)
   [[ "$node_num" -gt 1 ]] && {
-    echo "WARN:Found $node_num nodes:$node"
+    print_log "WARN:Found $node_num nodes:$node"
     swap_node=$(cat /proc/swaps \
               | grep dev \
               | cut -d ' ' -f 1 \
-              | sed s'/.$//')\
-    echo "swap_node:$swap_node"
+              | sed s'/.$//')
+    [[ -z "$swap_node" ]] && print_log "WARN:swap_node is null!"
+    print_log "swap_node:$swap_node"
     node=$(echo "$node" | grep "$swap_node")
-    echo "After auto check, boot EFI node:$node"
+    print_log "After auto check, boot EFI node:$node"
   }
 
   echo "umount -f /mnt"
