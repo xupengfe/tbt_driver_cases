@@ -1,3 +1,4 @@
 cleware.o
+pcie_check
 USBaccessBasic.o
 USBaccess.o
