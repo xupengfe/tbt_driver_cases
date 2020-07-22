@@ -115,7 +115,8 @@ set_tbt_ini() {
     echo "back up old ini files: cp -rf ${BIOS_DATA}/*.ini ${BIOS_DATA}/bak"
     cp -rf ${BIOS_DATA}/*.ini ${BIOS_DATA}/bak
 
-    echo "cp $TARGET_INI into ${BIOS_DATA} set_none/user/secure/dp.ini "
+    echo "cp $TARGET_INI into ${BIOS_DATA} set_none/user/secure/dp.ini"
+    cp -rf $TARGET_INI ${BIOS_DATA}/
     cp -rf $TARGET_INI ${BIOS_DATA}/set_none.ini
     cp -rf $TARGET_INI ${BIOS_DATA}/set_user.ini
     cp -rf $TARGET_INI ${BIOS_DATA}/set_secure.ini
@@ -126,6 +127,12 @@ set_tbt_ini() {
     sed -i s/${SECURE_NAME}=${secure_value}/${SECURE_NAME}=0x02/g $BIOS_DATA/set_secure.ini
     sed -i s/${SECURE_NAME}=${secure_value}/${SECURE_NAME}=0x03/g $BIOS_DATA/set_dp.ini
   else
+    echo "cp $TARGET_INI into ${BIOS_DATA} set_none/user/secure/dp.ini"
+    cp -rf $TARGET_INI ${BIOS_DATA}/
+    cp -rf $TARGET_INI ${BIOS_DATA}/set_none.ini
+    cp -rf $TARGET_INI ${BIOS_DATA}/set_user.ini
+    cp -rf $TARGET_INI ${BIOS_DATA}/set_secure.ini
+    cp -rf $TARGET_INI ${BIOS_DATA}/set_dp.ini
     echo "No $SECURE_NAME in $TARGET_INI file! Create $SECURE_NAME=0x00/1/2/3!"
     echo "${SECURE_NAME}=0x00" >> $BIOS_DATA/set_none.ini
     echo "${SECURE_NAME}=0x01" >> $BIOS_DATA/set_user.ini
