@@ -70,8 +70,8 @@ install_kernel_rpm() {
     print_log "lib/modules is null:$module failed"
     exit 1
   }
-  echo "rm -rf /usr/lib/modules/$module"
-  rm -rf /usr/lib/modules/$module
+  # echo "rm -rf /usr/lib/modules/$module"
+  # rm -rf /usr/lib/modules/$module
   sleep 1
   echo "cp -rf ${SCRIPT_PATH}/lib/modules/$module /usr/lib/modules/"
   cp -rf ${SCRIPT_PATH}/lib/modules/$module /usr/lib/modules/
