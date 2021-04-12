@@ -71,7 +71,7 @@ int main(int argc, char* argv[]) {
 			argc, argv[1][0], argv[2]);
 		sscanf(argv[2], "%x", &cle_id);
 		if ((cle_id < 0) || (cle_id >= USBcount)) {
-			printf("argv[2]:0x%x is not in cleware max range 0-0x%x present\n",
+			printf("argv[2]:0x%x is not in cleware max range 0~%d present\n",
 				cle_id, USBcount-1);
 			usage();
 		}
@@ -116,20 +116,24 @@ int main(int argc, char* argv[]) {
 	// power off/on only first cleware
 	if (argc == 2) {
 		USBcount = CWusb.OpenCleware();
-		devType = CWusb.GetUSBType(devID);
-		printf("Device %d: Type=%d, Version=%d, SerNum=%d\n\n", devID,
+
+		for (devID = 0; devID < USBcount; devID++) {
+			devType = CWusb.GetUSBType(devID);
+			printf("Device %d: Type=%d, Version=%d, SerNum=%d\n", devID,
 				devType, CWusb.GetVersion(devID),
 				CWusb.GetSerialNumber(devID));
-		if (devType == CUSBaccess::SWITCH1_DEVICE) {
-			if (argv[1][0] == '0') {
-				printf(" -> Only power OFF first connected cleware\n");
-				CWusb.SetSwitch(devID, CUSBaccess::SWITCH_0, 0);
-			} else if (argv[1][0] == '1') {
-				printf(" -> Only power ON first connected cleware\n");
-				CWusb.SetSwitch(devID, CUSBaccess::SWITCH_0, 1);
-			} else {
-				printf("Invalid argv[1][0] for cleware:%c\n", argv[1][0]);
-				printf("./cleware 1 to power on, 0 to power off\n");
+
+			if (devType == CUSBaccess::SWITCH1_DEVICE) {
+				if (argv[1][0] == '0') {
+					printf(" -> Power OFF cleware %x\n", devID);
+						CWusb.SetSwitch(devID, CUSBaccess::SWITCH_0, 0);
+				} else if (argv[1][0] == '1') {
+					printf(" -> Power ON cleware %x\n", devID);
+						CWusb.SetSwitch(devID, CUSBaccess::SWITCH_0, 1);
+				} else {
+					printf("Invalid argv[1][0] for cleware:%c\n", argv[1][0]);
+					printf("./cleware 1 to power on, 0 to power off\n");
+				}
 			}
 		}
 	}
