@@ -95,6 +95,12 @@ cwOpenCleware() {
 
 			if (ok >= 0 && !tryNextOne) {
 				data[handleCount].gadgettype = (enum USBtype_enum)dinfo.product;
+				// This is not correct to force change to SWITCHX_DEVICE 0x28
+				/*if (handleCount > 0)
+					data[handleCount].gadgettype = SWITCHX_DEVICE;
+				printf("data[%d].gadgettype:0x%x\n",
+					handleCount, data[handleCount].gadgettype);
+				*/
 				data[handleCount].gadgetVersionNo = dinfo.version;
 				ok = ioctl(data[handleCount].handle, HIDIOCAPPLICATION, 0);
 				if (ok == -1)
