@@ -187,10 +187,14 @@ int CUSBaccess::SetSwitch(int deviceNo, enum SWITCH_IDs Switch, int On) {
 	if (devType == SWITCH1_DEVICE || devType == AUTORESET_DEVICE || devType == WATCHDOG_DEVICE) {
 		s[0] = 0;
 		s[1] = Switch;
-		if (version < 4)	// old version do not invert
-			s[2] = !On;
+		if (version < 4)
+			s[2] = !On;  // old version do not invert
 		else
-			s[2] = On;
+			s[2] = On;   // new version will use On directly
+		// cleware 1 0 to power on cle id 0, s[0][1][2]: 0 0x10 0x1
+		// cleware 1 1 to power on cle id 1, s[0][1][2]: 0 0x10 0x1
+		// cleware 0 0 to power off cle id 0, s[0][1][2]: 0 0x10 0x0
+
 		rval = SetValue(deviceNo, s, 3);
 		if (rval && Switch == SWITCH_0) {			// set LED for first switch
 			if (On) {
