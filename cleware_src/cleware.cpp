@@ -72,7 +72,7 @@ int main(int argc, char* argv[]) {
 
 	USBcount = CWusb.OpenCleware();
 	if (argc == 2) {
-		printf("Cleware argc=%d,argv[1][0]=%c\n", argc, argv[1][0]);
+		printf("argc=%d,argv[1][0]=%c\n", argc, argv[1][0]);
 		if (argv[1][0] == 'h' || argv[1][1] == 'h')
 			usage();
 		if (argv[1][0] == 's') {
@@ -80,13 +80,13 @@ int main(int argc, char* argv[]) {
 			return 0;
 		}
 	} else if (argc == 3) {
-		printf("Cleware argc=%d,argv[1][0]=%c, argv[2]:%s\n",
+		printf("argc=%d,argv[1][0]=%c, argv[2]:%s\n",
 			argc, argv[1][0], argv[2]);
 		sscanf(argv[2], "%x", &cle_id);
 		if ((cle_id < 0) || (cle_id >= USBcount)) {
-			printf("argv[2]:0x%x is not in cleware max range 0~%d present\n",
+			printf("argv[2]:0x%x is not in Cleware max range 0~%d present\n",
 				cle_id, USBcount-1);
-			usage();
+			return 2;
 		}
 	} else
 		usage();
@@ -96,9 +96,9 @@ int main(int argc, char* argv[]) {
 		usage();
 	}
 
-	printf("Open Cleware %d USBcount\n", USBcount);
+	printf("Open %d clewares\n", USBcount);
 
-	printf("***** Before action, cleware ID status is as below *****\n");
+	printf("***** Before action, clewares status is as below *****\n");
 	check_status();
 
 	// power off/on specific cleware 0-0xf
@@ -111,12 +111,12 @@ int main(int argc, char* argv[]) {
 				CWusb.GetSerialNumber(cle_id));
 
 		if (argv[1][0] == '0') {
-			printf("-> Power off Cleware:0x%x\n", cle_id);
+			printf("-> Power off cleware_id:0x%x\n", cle_id);
 			CWusb.SetSwitch(cle_id, CUSBaccess::SWITCH_0, 0);
 			//usleep(30 * 1000);
 			//state =CWusb.SetSwitch(cle_id, CUSBaccess::SWITCH_0, 0);
 		} else if (argv[1][0] == '1') {
-			printf("-> Power on Cleware:0x%x\n", cle_id);
+			printf("-> Power on cleware_id:0x%x\n", cle_id);
 			CWusb.SetSwitch(cle_id, CUSBaccess::SWITCH_0, 1);
 			usleep(30 * 1000);
 			//state =CWusb.SetSwitch(cle_id, CUSBaccess::SWITCH_0, 1);
@@ -138,10 +138,10 @@ int main(int argc, char* argv[]) {
 
 			if (devType == CUSBaccess::SWITCH1_DEVICE) {
 				if (argv[1][0] == '0') {
-					printf(" -> Power OFF cleware %x\n", devID);
+					printf(" -> Power OFF cleware_id %x\n", devID);
 						CWusb.SetSwitch(devID, CUSBaccess::SWITCH_0, 0);
 				} else if (argv[1][0] == '1') {
-					printf(" -> Power ON cleware %x\n", devID);
+					printf(" -> Power ON cleware_id %x\n", devID);
 						CWusb.SetSwitch(devID, CUSBaccess::SWITCH_0, 1);
 				} else {
 					printf("Invalid argv[1][0] for cleware:%c\n", argv[1][0]);
@@ -152,7 +152,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	usleep(50 * 1000);
-	printf("\n***** After action, cleware ID status is as below *****\n");
+	printf("\n***** After action, clewares status is as below *****\n");
 	check_status();
 
 	CWusb.CloseCleware();
