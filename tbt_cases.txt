@@ -10,6 +10,8 @@ Setup:
     CONFIG_INTEL_IOMMU=y
     CONFIG_INTEL_IOMMU_DEFAULT_ON=y
     CONFIG_DMA_API_DEBUG=y
+    CONFIG_USB4=m
+    CONFIG_USB4_NET=m
   The following test cases should be done in both ACPI enumeration (BIOS assisged) and
   native PCIe hotplug mode.
 
@@ -43,8 +45,8 @@ Part 1 - TBT BAT tests:
 Command sample: "./runtests.sh -p cfl-s_cnl-h -P cfl-s_cnl-h -f ddt_intel/tbt_bat_tests -o /opt/logs/tbt_bat -c"
 1-1   TBT_XS_BAT_CONFIG_TEST tbt_verify_sysfs_mod.sh -t config
       Steps: check kconfig should set below items:
-             CONFIG_THUNDERBOLT=m
-             CONFIG_THUNDERBOLT_NET=m
+             CONFIG_USB4=m
+             CONFIG_USB4_NET=m
              Other value will be failed.
 
 1-2   TBT_XS_BAT_USER_MODE_TEST tbt_verify_sysfs_mod.sh -t user
