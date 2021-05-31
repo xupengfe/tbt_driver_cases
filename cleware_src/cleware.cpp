@@ -57,7 +57,7 @@ int check_status()
 			CWshow.GetSeqSwitch(id, switchID, 0);
 			CWshow.GetSwitch(id, switchID);
 		}
-		printf("Cleware %x power status = %d\n",
+		printf("Cleware %x power status=%d\n",
 				id, CWshow.GetSeqSwitch(id, switchID, 0));
 	}
 	CWshow.CloseCleware();
