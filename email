@@ -1,14 +1,14 @@
 #!/bin/bash
 
-version=
+version=""
 [[ $1 =~ ^v[1-9]$ ]] && {
-	version=" $1"
+	version="$1"
 	shift
 }
 
-repo="tbt_cases"
+repo="tbt] [PATCH"
 
-files=$(git format-patch -M --subject-prefix="PATCH$version $repo" "${@:--1}")
+files=$(git format-patch -M --subject-prefix="$repo $version" "${@:--1}")
 
 for file in $files
 do
