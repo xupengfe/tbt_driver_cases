@@ -1,7 +1,7 @@
 #!/bin/bash
 
 file_ori="/root/10G_random"
-file_tar="/nvme1/10G_random_tar"
+file_tar="/nvme1/10G_random_cp_target"
 test_log="./test.log"
 
 cat /dev/null > $test_log
