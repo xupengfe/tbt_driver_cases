@@ -9,14 +9,14 @@ cat /dev/null > $test_log
 for((i=1;;i++)); do
   echo "$(date)*******Execute $i loops*******"
   echo "$(date)*******Execute $i loops*******" >> $test_log
-  echo "cp -rf $file_ori $file_tar"
-  echo "cp -rf $file_ori $file_tar" >> $test_log
-  cp -rf $file_ori $file_tar
+  echo "dd if=$file_ori of=$file_tar"
+  echo "dd if=$file_ori of=$file_tar" >> $test_log
+  dd if=$file_ori of=$file_tar
 
   #rm -rf $file_ori
-  echo "cp -rf $file_tar ${file_ori}_bak"
-  echo "cp -rf $file_tar ${file_ori}_bak" >> $test_log
-  cp -rf $file_tar ${file_ori}_bak
+  echo "dd if=$file_tar of=${file_ori}_bak"
+  echo "dd if=$file_tar of=${file_ori}_bak" >> $test_log
+  dd if=$file_tar of=${file_ori}_bak
   
   echo "rm -rf $file_tar"
   rm -rf $file_tar
