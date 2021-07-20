@@ -14,9 +14,9 @@ for((i=1;;i++)); do
   cp -rf $file_ori $file_tar
 
   #rm -rf $file_ori
-  echo "cp -rf $file_tar ${file_ori}_bak"
-  echo "cp -rf $file_tar ${file_ori}_bak" >> $test_log
-  cp -rf $file_tar ${file_ori}_bak
+  echo "cp -rf $file_tar ${file_ori}_cp_bak"
+  echo "cp -rf $file_tar ${file_ori}_cp_bak" >> $test_log
+  cp -rf $file_tar ${file_ori}_cp_bak
   
   echo "rm -rf $file_tar"
   rm -rf $file_tar
