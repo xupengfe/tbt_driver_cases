@@ -54,6 +54,7 @@ TBT_STUFF_LIST="/tmp/tbt_stuff_list.txt"
 PF_BIOS=""
 TBT_NUM=""
 ROOT_PCI=""
+SYS_PATH=""
 
 rm -rf /root/test_tbt_1.log
 pci_result=$(lspci -t)
@@ -73,10 +74,6 @@ test_print_trc()
   echo "|$(date +"$TIME_FMT")|TRACE|$log_info|" >> /root/test_tbt_1.log
 }
 
-
-
-################################ CLI Params ####################################
-# Please use getopts
 while getopts  :h arg
 do case $arg in
                 h)      usage;;
@@ -91,6 +88,7 @@ done
 
 tbt_us_pci()
 {
+  local domianx=$1
   local pcis=""
   local pci=""
   local pci_us=""
@@ -102,13 +100,13 @@ tbt_us_pci()
     echo "Could not find tbt root PCI, exit!"
     exit 2
   }
-  dr_pci_h=$(udevadm info -q path --path=${TBT_PATH}/domain0 \
+
+  # dr_pci_h: BUS /devices/pci0000:00/0000:00:0d.3/domain1 -> 00
+  dr_pci_h=$(udevadm info -q path --path=${TBT_PATH}/domain${domianx} \
             | awk -F "/" '{print $(NF-1)}' \
             | cut -d ':' -f 2)
   dr_pci_d=$((0x"$dr_pci_h"))
   pcis=$(ls -1 $PCI_PATH)
-  cat /dev/null > $PCI_HEX_FILE
-  cat /dev/null > $PCI_DEC_FILE
   for pci in $pcis; do
     pci_us=""
     PCI_HEX=""
@@ -120,7 +118,7 @@ tbt_us_pci()
     if [[ -z "$pci_us" ]]; then
       continue
     else
-      #echo "Upstream pci:$pci"
+      echo "Upstream pci:$pci"
       PCI_HEX=$(echo "$pci" | cut -d ':' -f 2)
       PCI_DEC=$((0x"$PCI_HEX"))
       # Due to ICL tbt driver PCI 00:0d.2 and 00:0d.3
@@ -133,16 +131,93 @@ tbt_us_pci()
       echo "$PCI_DEC" >> $PCI_DEC_FILE
     fi
   done
+
   #echo "TBT device upstream PCI in hex:"
   #cat $PCI_HEX_FILE
   #echo "TBT device upstream PCI in dec:"
   #cat $PCI_DEC_FILE
 }
 
+# Integrated TBT root PCI will be changed so need to verify and find it
+# Input: $1 TBT_ROOT_PCI
+# Return 0 for true, otherwise false or block_test
+verify_tbt_root_pci() {
+  local root_pci=$1
+  local dev_path="/sys/devices/pci0000:00"
+  local result=""
+  local pf=""
+  local pf_name=""
+  local tbt_dev=""
+
+  # get like 1-3
+  tbt_dev=$(ls ${TBT_PATH} \
+              | grep "$REGEX_DEVICE" \
+              | grep -v "$HOST_EXCLUDE" \
+              | grep -v ":" \
+              | awk '{ print length(), $0 | "sort -n" }' \
+              | cut -d ' ' -f 2 \
+              | head -n1)
+
+  pf=$(dmidecode --type bios \
+            | grep Version \
+            | cut -d ':' -f 2)
+  pf_name=$(echo ${pf: 1: 4})
+
+  result=$(ls -1 $dev_path/$root_pci | grep "0000" | grep "07")
+
+  if [[ -z "$result" ]]; then
+    [[ "$tbt_dev" == *"-1"* ]] && {
+      [[ "$root_pci" == *"0d.2" ]] && ROOT_PCI="0000:00:07.0"
+      [[ "$root_pci" == *"0d.3" ]] && ROOT_PCI="0000:00:07.2"
+    }
+    [[ "$tbt_dev" == *"-3"* ]] && {
+      [[ "$root_pci" == *"0d.2" ]] && ROOT_PCI="0000:00:07.1"
+      [[ "$root_pci" == *"0d.3" ]] && ROOT_PCI="0000:00:07.3"
+    }
+    SYS_PATH="$dev_path/$ROOT_PCI"
+    test_print_trc "Discrete or FW CM on $pf_name,root:$ROOT_PCI, $SYS_PATH"
+  elif [[ "$tbt_dev" == *"-1"* ]]; then
+    ROOT_PCI=$(ls -1 $dev_path/$root_pci \
+                  | grep "0000" \
+                  | grep "07" \
+                  | head -n 2 \
+                  | head -n 1 \
+                  | awk -F "pci:" '{print $2}')
+    SYS_PATH="$dev_path/$ROOT_PCI"
+    test_print_trc "Integrated on $pf_name, $tbt_dev $root_pci -> $ROOT_PCI"
+  elif [[ "$tbt_dev" == *"-3"* ]]; then
+    ROOT_PCI=$(ls -1 $dev_path/$root_pci \
+                  | grep "0000" \
+                  | grep "07" \
+                  | head -n 2 \
+                  | tail -n 1\
+                  | awk -F "pci:" '{print $2}')
+    SYS_PATH="$dev_path/$ROOT_PCI"
+    test_print_trc "Integrated on $pf_name, $tbt_dev $root_pci -> $ROOT_PCI"
+  elif [[ -z "$tbt_dev" ]]; then
+    [[ "$root_pci" == *"0d.2" ]] && ROOT_PCI="0000:00:07.0"
+    [[ "$root_pci" == *"0d.3" ]] && ROOT_PCI="0000:00:07.2"
+    SYS_PATH="$dev_path/$ROOT_PCI"
+  else
+    die "Invalid tbt device sysfs:$tbt_dev"
+  fi
+  test_print_trc "TBT ROOT:$ROOT_PCI SYS_PATH:$dev_path/$ROOT_PCI"
+}
+
 find_root_pci()
 {
   local tbt_devs=""
   local pf_name=""
+  local tbt_dev=""
+
+  # get like 1-3
+  tbt_dev=$(ls ${TBT_PATH} \
+              | grep "$REGEX_DEVICE" \
+              | grep -v "$HOST_EXCLUDE" \
+              | grep -v ":" \
+              | awk '{ print length(), $0 | "sort -n" }' \
+              | cut -d ' ' -f 2 \
+              | head -n1)
 
   pf_name=$(dmidecode --type bios \
                  | grep Version \
@@ -150,21 +225,9 @@ find_root_pci()
                  | cut -d '.' -f 1)
   #local pf_name=$(dmidecode | grep "ICL")
 
-  case $pf_name in
-    *ICL*)
-      PF_BIOS="ICL"
-      ROOT_PCI="00:07"
-      ;;
-    *TGL*)
-      PF_BIOS="TGL"
-      ROOT_PCI="00:07"
-      ;;
-    *)
-     PF_BIOS="$pf_name"
-     ROOT_PCI=$(udevadm info --attribute-walk --path=/sys/bus/thunderbolt/devices/0-0 | grep KERNEL | tail -n 2 | grep -v pci0000 | cut -d "\"" -f 2)
-     #ROOT_PCI="0000:03:00.0"
-     ;;
-  esac
+  ROOT_PCI=$(udevadm info --attribute-walk --path=/sys/bus/thunderbolt/devices/${tbt_dev} | grep KERNEL | tail -n 2 | grep -v pci0000 | cut -d "\"" -f 2)
+
+  verify_tbt_root_pci "$ROOT_PCI"
   echo "PF_BIOS:$PF_BIOS platform, ROOT_PCI:$ROOT_PCI"
 }
 
@@ -584,18 +647,22 @@ usb4_view()
     | grep "-" \
     | awk -F "${REGEX_DOMAIN}${domainx}/" '{print $2}' \
     | awk '{ print length(), $0 | "sort -n" }' \
+    | grep -v ":" \
+    | grep -v "_" \
     | cut -d ' ' -f 2 \
     | tr '/' ' ' \
     > $tbt_sys_file
   # need tbt devices in order
   tbt_devs=$(ls ${TBT_PATH} 2>/dev/null \
     | grep "-" \
+    | grep -v ":" \
     | grep "^${domainx}" \
     | grep "${tn}$" \
     | awk '{ print length(), $0 | "sort -n" }' \
     | cut -d ' ' -f 2)
   device_num=$(ls ${TBT_PATH} \
     | grep "^${domainx}" \
+    | grep -v ":" \
     | grep "${tn}$" \
     | wc -l)
   echo "$domainx-$tn contains $device_num tbt devices."
@@ -670,8 +737,10 @@ topo_tbt_show()
   local domain=""
   local topo_result=""
 
+  # domains example 0  1
   domains=$(ls $TBT_PATH/ \
             | grep "$REGEX_DOMAIN" \
+            | grep -v ":" \
             | awk -F "$REGEX_DOMAIN" '{print $2}' \
             | awk -F "->" '{print $1}')
   cat /dev/null > "$TBT_DEV_FILE"
@@ -909,6 +978,10 @@ echo
 # due to falcon ridge find pci a little slow
 sleep 1
 find_root_pci
-tbt_us_pci
+
+cat /dev/null > $PCI_HEX_FILE
+cat /dev/null > $PCI_DEC_FILE
+# will not impact, it will scan all PCI
+tbt_us_pci "0"
 check_tbt_us_pci
 find_tbt_dev_stuff
