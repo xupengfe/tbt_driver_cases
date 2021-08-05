@@ -219,6 +219,8 @@ find_root_pci()
               | cut -d ' ' -f 2 \
               | head -n1)
 
+  [[ -z "$tbt_dev" ]] && tbt_dev="0-0"
+
   pf_name=$(dmidecode --type bios \
                  | grep Version \
                  | cut -d ':' -f 2 \
