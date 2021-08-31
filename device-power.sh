@@ -1,6 +1,8 @@
 #!/bin/sh
 #
 # Copyright (C) 2018, Intel Corporation
+# https://gitlab.devtools.intel.com/mwesterb/lpsstest/-/blob/master/device-power.sh
+# device-power.sh -s
 #
 
 export PATH=/bin:/usr/bin
@@ -224,6 +226,7 @@ show_acpi_devices
 
 for pmc in $all_pmc_pci_devices; do
 	name=$(lspci -d "8086:$pmc" 2>/dev/null)
+	echo "name:$name"
 	if [ -n "$name" ]; then
 		show_lpss_status_pmc
 	fi
