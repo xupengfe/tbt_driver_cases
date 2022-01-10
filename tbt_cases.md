@@ -591,3 +591,7 @@ Command sample:"./runtests.sh -p cfl-s_cnl-h -P cfl-s_cnl-h -f ddt_intel/tbt_dua
 
 ### 16-4 TBT Dual controller secure:
       Step: check domian0 and 1 secure mode should same
+
+## Part 17 - TBT boot with tbt3 device test
+
+### 17-1 Check TBT3 device with USB3.0 should be recognized after boot and should not access in D3
