@@ -18,6 +18,7 @@ hot_plug() {
   local p1=""
   local p2=""
 
+  serial_cmd "port0"
   p0=$(serial_cmd "status" | grep "PORTF")
   echo "p0:$p0"
   serial_cmd "superspeed"
