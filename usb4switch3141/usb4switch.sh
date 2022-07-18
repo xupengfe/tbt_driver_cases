@@ -1,5 +1,16 @@
 #!/bin/bash
 
+usage() {
+  cat <<__EOF
+  usage: ./${0##*/}  [on|on2|off|s|h]
+  on   Connect host port to port1 with super speed
+  on2  Connect host port to port2 with super speed
+  off  Disconned all ports with host port
+  s    Check current status
+  h    Show this
+__EOF
+}
+
 serial_cmd() {
   local cmd_file=$1
 
@@ -14,12 +25,21 @@ serial_cmd() {
 
 check_status() {
   local state=""
+  local port=""
 
   state=$(serial_cmd "status" | grep "PORTF" 2>/dev/null)
+  port=$(echo "$state" | awk -F ' ' '{print $NF}')
   if [[ -z "$state" ]]; then
     echo "Seems no USB4 switch 3141 connected state:$state"
   else
     echo "USB4 switch 3141 connected, state:$state"
+  fi
+  if [[ $port == *"0x12"* ]]; then
+    echo "Connect with port 1"
+  elif  [[ $port == *"0x3"* ]]; then
+    echo "Connect with port 2"
+  else
+    echo "No ports connected."
   fi
 }
 
@@ -36,12 +56,25 @@ plug_in() {
   fi
 }
 
+plug_in2() {
+  local plug_state=""
+
+  plug_state=$(serial_cmd "status" | grep "PORTF: 0x3" 2>/dev/null)
+  if [[ -n "$plug_state" ]]; then
+    echo "Already connected port 2 for USB4 switch:$plug_state"
+  else
+    echo "plug_state:$plug_state not 0x3 to connect port1."
+    serial_cmd "superspeed"
+    serial_cmd "port2"
+  fi
+}
+
 plug_out() {
   local plug_state=""
 
   plug_state=$(serial_cmd "status" | grep "PORTF: 0x70" 2>/dev/null)
   if [[ -n "$plug_state" ]]; then
-    echo "Already disconnected port 1 for USB4 switch:$plug_state"
+    echo "Already disconnected port 1 & 2 for USB4 switch:$plug_state"
   else
     echo "plug_state:$plug_state not 0x70 for all disconnected."
     serial_cmd "superspeed"
@@ -81,10 +114,16 @@ case $parm in
   on)
     plug_in
     ;;
+  on2)
+    plug_in2
+    ;;
   off)
     plug_out
     ;;
-  *)
+  hot)
     hot_plug
+    ;;
+  *)
+    usage
     ;;
 esac
