@@ -7,6 +7,7 @@ usage() {
   2    Connect host port to port 2 with super speed
   off  Disconned all ports with host port
   s    Check current status
+  hot  One round port 1, 2 and disconnect test
   h|*  Show this and show status
 __EOF
 }
