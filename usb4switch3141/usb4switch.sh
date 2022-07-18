@@ -2,12 +2,12 @@
 
 usage() {
   cat <<__EOF
-  usage: ./${0##*/}  [on|on2|off|s|h]
-  on   Connect host port to port1 with super speed
-  on2  Connect host port to port2 with super speed
+  usage: ./${0##*/}  [1|2|off|s|h|*]
+  1    Connect host port to port 1 with super speed
+  2    Connect host port to port 2 with super speed
   off  Disconned all ports with host port
   s    Check current status
-  h    Show this
+  h|*  Show this and show status
 __EOF
 }
 
@@ -30,9 +30,10 @@ check_status() {
   state=$(serial_cmd "status" | grep "PORTF" 2>/dev/null)
   port=$(echo "$state" | awk -F ' ' '{print $NF}')
   if [[ -z "$state" ]]; then
-    echo "Seems no USB4 switch 3141 connected state:$state"
+    echo "Didn't detect USB4 switch 3141 state:$state"
+    return 1
   else
-    echo "USB4 switch 3141 connected, state:$state"
+    echo "Detected USB4 switch 3141, state:$state"
   fi
   if [[ $port == *"0x12"* ]]; then
     echo "Connect with port 1"
@@ -111,10 +112,10 @@ case $parm in
   s)
     check_status
     ;;
-  on)
+  1)
     plug_in
     ;;
-  on2)
+  2)
     plug_in2
     ;;
   off)
@@ -125,5 +126,6 @@ case $parm in
     ;;
   *)
     usage
+    check_status
     ;;
 esac
