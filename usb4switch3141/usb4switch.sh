@@ -30,7 +30,7 @@ plug_in() {
   if [[ -n "$plug_state" ]]; then
     echo "Already connected port 1 for USB4 switch:$plug_state"
   else
-    echo "plug_state:$plug_state"
+    echo "plug_state:$plug_state not 0x12 to connect port1."
     serial_cmd "superspeed"
     serial_cmd "port1"
   fi
@@ -41,9 +41,9 @@ plug_out() {
 
   plug_state=$(serial_cmd "status" | grep "PORTF: 0x70" 2>/dev/null)
   if [[ -n "$plug_state" ]]; then
-    echo "Already connected port 1 for USB4 switch:$plug_state"
+    echo "Already disconnected port 1 for USB4 switch:$plug_state"
   else
-    echo "plug_state:$plug_state"
+    echo "plug_state:$plug_state not 0x70 for all disconnected."
     serial_cmd "superspeed"
     serial_cmd "port0"
   fi
