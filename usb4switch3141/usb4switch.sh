@@ -16,11 +16,11 @@ serial_cmd() {
   local cmd_file=$1
 
   {
-    sleep 1;
+    sleep 1
     while pgrep runscript > /dev/null; do
-      sleep 1;
-    done;
-    cat escape.txt;
+      sleep 1
+    done
+    cat escape.txt
   } | minicom -b 9600 -D /dev/ttyACM0 -S $cmd_file -C capture.txt
 }
 
