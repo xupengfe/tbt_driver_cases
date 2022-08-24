@@ -1,5 +1,7 @@
 #!/bin/bash
 
+SWITCH_NODE="/dev/ttyACM0"
+
 usage() {
   cat <<__EOF
   usage: ./${0##*/}  [1|2|off|s|h|*]
@@ -18,7 +20,7 @@ serial_cmd() {
   {
     sleep 1
     cat escape.txt
-  } | minicom -b 9600 -D /dev/ttyACM0 -S $cmd_file -C capture.txt
+  } | minicom -b 9600 -D "$SWITCH_NODE" -S $cmd_file -C capture.txt
 }
 
 check_status() {
@@ -106,6 +108,12 @@ hot_plug() {
 }
 
 parm=$1
+[[ -d "$SWITCH_NODE" ]] || {
+  echo "SKIP: No USB4 switch node:$SWITCH_NODE"
+  usage
+  exit 2
+}
+
 case $parm in
   s)
     check_status
