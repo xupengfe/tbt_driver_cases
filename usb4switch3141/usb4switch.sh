@@ -108,7 +108,7 @@ hot_plug() {
 }
 
 parm=$1
-[[ -d "$SWITCH_NODE" ]] || {
+[[ -e "$SWITCH_NODE" ]] || {
   echo "SKIP: No USB4 switch node:$SWITCH_NODE"
   usage
   exit 2
