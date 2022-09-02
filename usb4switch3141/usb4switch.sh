@@ -4,10 +4,10 @@ SWITCH_NODE="/dev/ttyACM0"
 
 usage() {
   cat <<__EOF
-  usage: ./${0##*/}  [1|2|off|s|h|*]
+  usage: ./${0##*/}  [1|2|0 or off|s|h|*]
   1    Connect host port to port 1 with super speed
   2    Connect host port to port 2 with super speed
-  off  Disconned all ports with host port
+  0|off  Disconned all ports with host port
   s    Check current status
   hot  One round port 1, 2 and disconnect test
   h|*  Show this and show status
@@ -124,7 +124,7 @@ case $parm in
   2)
     plug_in2
     ;;
-  off)
+  0|off)
     plug_out
     ;;
   hot)
