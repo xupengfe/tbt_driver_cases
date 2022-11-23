@@ -2,6 +2,9 @@
 
 SWITCH_NODE="/dev/ttyACM0"
 
+# Any path could run this script
+cd "$(dirname $0)" 2> /dev/null
+
 usage() {
   cat <<__EOF
   usage: ./${0##*/}  [1|2|0 or off|s|h|*]
