@@ -1,6 +1,7 @@
 #!/bin/sh
 #
 # Copyright (C) 2018, Intel Corporation
+# Author: Westerberg, Mika <mika.westerberg@intel.com>
 # https://gitlab.devtools.intel.com/mwesterb/lpsstest/-/blob/master/device-power.sh
 # device-power.sh -s
 #
