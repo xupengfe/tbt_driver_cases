@@ -249,7 +249,7 @@ check_device_sysfs()
                 | grep "$REGEX_TARGET" \
                 | awk '{ print length(), $0 | "sort -n" }' \
                 | cut -d ' ' -f 2)
-  
+
   [ -z "$aim_folders" ] && test_print_trc "AIM floder is not exist" && return 1
   for AIM_FOLDER in ${aim_folders}; do
     if [ -e "${TBT_PATH}/${AIM_FOLDER}/${AIM_FILE}" ];then
