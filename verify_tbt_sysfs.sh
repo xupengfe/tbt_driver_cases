@@ -1,31 +1,10 @@
-#! /bin/bash
-#
-# Copyright 2017 Intel Corporation
-#
-# This file is part of LTP-DDT for IA to validate thunderbolt component
-#
-# This program file is free software; you can redistribute it and/or modify it
-# under the terms and conditions of the GNU General Public License,
-# version 1, as published by the Free Software Foundation.
-#
-# This program is distributed in the hope it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-# more details.
-#
-# Author:
-#             Pengfei Xu <pengfei.xu@intel.com>
-#
-# History:
-#             July. 27, 2017
+#!/bin/bash
+# SPDX-License-Identifier: GPL-2.0-only
+# Copyright (c) 2017 Intel Corporation
+# @Desc Authorize thunderbolt devices and list detailed stuffs under tbt devices
+# Author: Pengfei Xu <pengfei.xu@intel.com>
+# Created date: July. 27, 2017
 
-
-# @desc This script verify controllers files exist on sysfs for thunderbolt
-# @params None
-# @returns Fail the test if return code is non-zero (value set not found)
-
-#source "common.sh"  # Import do_cmd(), die() and other functions
-############################# Functions ########################################
 TIME_FMT="%Y%m%d-%H%M%S.%N"
 TBT_DEV_FILE="/tmp/tbt_name.txt"
 TBT_PATH="/sys/bus/thunderbolt/devices"
@@ -33,7 +12,6 @@ REGEX_DEVICE="-"
 REGEX_DOMAIN="domain"
 DEV_FILE="/tmp/tbt_dev"
 DEV_LIST="/tmp/dev_list"
-#DEVICE_FILES=("authorized" "device" "device_name" "nvm_authenticate" "nvm_version" "uevent" "unique_id" "vendor" "vendor_name")
 export DEVICE_FILES="authorized device device_name link_speed link_width nvm_authenticate nvm_version uevent unique_id vendor vendor_name power/control"
 export POWER_FILES="power/control power/runtime_status power/runtime_enabled"
 export DOMAIN_FILES="security uevent"
@@ -61,29 +39,29 @@ pci_result=$(lspci -t)
 
 usage()
 {
-        cat <<-EOF >&2
-        usage: ./${0##*/} [-h help] Or no need parameter
+  cat <<-EOF >&2
+  usage: ./${0##*/} [-h help] Or no need parameter
 EOF
-        exit 0
+  exit 0
 }
 
 test_print_trc()
 {
   log_info=$1      # trace information
+
   echo "|$(date +"$TIME_FMT")|TRACE|$log_info|"
   echo "|$(date +"$TIME_FMT")|TRACE|$log_info|" >> /root/test_tbt_1.log
 }
 
-while getopts  :h arg
-do case $arg in
-                h)      usage;;
-                :)      usage
-                        exit 0
-                        ;;
-                \?)     usage
-                        exit 0
-                        ;;
-esac
+while getopts :h arg
+  do case $arg in
+    h)
+      usage
+      ;;
+    *)
+      usage
+      ;;
+  esac
 done
 
 tbt_us_pci()
@@ -102,7 +80,7 @@ tbt_us_pci()
   }
 
   # dr_pci_h: BUS /devices/pci0000:00/0000:00:0d.3/domain1 -> 00
-  dr_pci_h=$(udevadm info -q path --path=${TBT_PATH}/domain${domianx} \
+  dr_pci_h=$(udevadm info -q path --path=${TBT_PATH}/domain"$domianx" \
             | awk -F "/" '{print $(NF-1)}' \
             | cut -d ':' -f 2)
   dr_pci_d=$((0x"$dr_pci_h"))
@@ -132,6 +110,7 @@ tbt_us_pci()
     fi
   done
 
+  # As follow is for debug
   #echo "TBT device upstream PCI in hex:"
   #cat $PCI_HEX_FILE
   #echo "TBT device upstream PCI in dec:"
@@ -163,7 +142,7 @@ verify_tbt_root_pci() {
             | cut -d ':' -f 2)
   pf_name=$(echo ${pf: 1: 4})
 
-  result=$(ls -1 $dev_path/$root_pci | grep "0000" | grep "07")
+  result=$(ls -1 $dev_path/"$root_pci" | grep "0000" | grep "07")
 
   if [[ -z "$result" ]]; then
     [[ "$tbt_dev" == *"-1"* ]] && {
@@ -177,7 +156,7 @@ verify_tbt_root_pci() {
     SYS_PATH="$dev_path/$ROOT_PCI"
     test_print_trc "Discrete or FW CM on $pf_name,root:$ROOT_PCI, $SYS_PATH"
   elif [[ "$tbt_dev" == *"-1"* ]]; then
-    ROOT_PCI=$(ls -1 $dev_path/$root_pci \
+    ROOT_PCI=$(ls -1 $dev_path/"$root_pci" \
                   | grep "0000" \
                   | grep "07" \
                   | head -n 2 \
@@ -186,7 +165,7 @@ verify_tbt_root_pci() {
     SYS_PATH="$dev_path/$ROOT_PCI"
     test_print_trc "Integrated on $pf_name, $tbt_dev $root_pci -> $ROOT_PCI"
   elif [[ "$tbt_dev" == *"-3"* ]]; then
-    ROOT_PCI=$(ls -1 $dev_path/$root_pci \
+    ROOT_PCI=$(ls -1 $dev_path/"$root_pci" \
                   | grep "0000" \
                   | grep "07" \
                   | head -n 2 \
@@ -210,7 +189,7 @@ find_root_pci()
   local pf_name=""
   local tbt_dev=""
 
-  # get like 1-3
+  # get like 1-3 tbt sysfs folder
   tbt_dev=$(ls ${TBT_PATH} \
               | grep "$REGEX_DEVICE" \
               | grep -v "$HOST_EXCLUDE" \
@@ -225,9 +204,8 @@ find_root_pci()
                  | grep Version \
                  | cut -d ':' -f 2 \
                  | cut -d '.' -f 1)
-  #local pf_name=$(dmidecode | grep "ICL")
 
-  ROOT_PCI=$(udevadm info --attribute-walk --path=/sys/bus/thunderbolt/devices/${tbt_dev} | grep KERNEL | tail -n 2 | grep -v pci0000 | cut -d "\"" -f 2)
+  ROOT_PCI=$(udevadm info --attribute-walk --path=/sys/bus/thunderbolt/devices/"$tbt_dev" | grep KERNEL | tail -n 2 | grep -v pci0000 | cut -d "\"" -f 2)
 
   verify_tbt_root_pci "$ROOT_PCI"
   echo "PF_BIOS:$PF_BIOS platform, ROOT_PCI:$ROOT_PCI"
@@ -235,50 +213,45 @@ find_root_pci()
 
 enable_authorized()
 {
-local AIM_FOLDERS
-AIM_FOLDERS=$(ls -1 ${TBT_PATH} \
-              | grep "$REGEX_DEVICE" \
-              | awk '{ print length(), $0 | "sort -n" }' \
-              | cut -d ' ' -f 2)
+  local aim_folders=""
 
-[ -z "$AIM_FOLDERS" ] && test_print_trc "Device folder is not exist" && return 1
-#for AIM_FOLDER in $(ls "$TBT_PATH" | grep "$REGEX_TARGET")
-for AIM_FOLDER in ${AIM_FOLDERS}
-#for AIM_FOLDER in $(ls "$TBT_PATH"/*"$REGEX_TARGET"*)
-do
-  if [ -e "${TBT_PATH}/${AIM_FOLDER}/${AUTHORIZE_FILE}" ];then
-    AUTHORIZE_INFO=$(cat "${TBT_PATH}/${AIM_FOLDER}/${AUTHORIZE_FILE}")
-    if [ "$AUTHORIZE_INFO" == "0" ]; then
-      test_print_trc "Change 0 to 1 for file: ${TBT_PATH}/${AIM_FOLDER}/${AUTHORIZE_FILE}"
-      echo 1 > "${TBT_PATH}/${AIM_FOLDER}/${AUTHORIZE_FILE}" || \
-      test_print_trc "Change ${TBT_PATH}/${AIM_FOLDER}/${AUTHORIZE_FILE} failed!"
-      sleep 5
-    else
-      test_print_trc "${TBT_PATH}/${AIM_FOLDER}/${AUTHORIZE_FILE}: ${AUTHORIZE_INFO}"
+  aim_folders=$(ls -1 ${TBT_PATH} \
+                | grep "$REGEX_DEVICE" \
+                | awk '{ print length(), $0 | "sort -n" }' \
+                | cut -d ' ' -f 2)
+
+  [ -z "$aim_folders" ] && test_print_trc "Device folder is not exist" && return 1
+
+  for AIM_FOLDER in ${aim_folders}; do
+    if [ -e "${TBT_PATH}/${AIM_FOLDER}/${AUTHORIZE_FILE}" ];then
+      AUTHORIZE_INFO=$(cat "${TBT_PATH}/${AIM_FOLDER}/${AUTHORIZE_FILE}")
+      if [ "$AUTHORIZE_INFO" == "0" ]; then
+        test_print_trc "Change 0 to 1 for file: ${TBT_PATH}/${AIM_FOLDER}/${AUTHORIZE_FILE}"
+        echo 1 > "${TBT_PATH}/${AIM_FOLDER}/${AUTHORIZE_FILE}" || \
+        test_print_trc "Change ${TBT_PATH}/${AIM_FOLDER}/${AUTHORIZE_FILE} failed!"
+        sleep 5
+      else
+        test_print_trc "${TBT_PATH}/${AIM_FOLDER}/${AUTHORIZE_FILE}: ${AUTHORIZE_INFO}"
+      fi
     fi
-  fi
-done
+  done
 }
 
 check_device_sysfs()
 {
-REGEX_TARGET=$1
-AIM_FILE=$2
-test_print_trc "____________________Now Cheking '$AIM_FILE'___________________"
-local AIM_FOLDERS
-AIM_FOLDERS=$(ls -1 ${TBT_PATH} \
-              | grep "$REGEX_TARGET" \
-              | awk '{ print length(), $0 | "sort -n" }' \
-              | cut -d ' ' -f 2)
+  REGEX_TARGET=$1
+  AIM_FILE=$2
+  local aim_folders=""
 
-[ -z "$AIM_FOLDERS" ] && test_print_trc "AIM floder is not exist" && return 1
-for AIM_FOLDER in ${AIM_FOLDERS}
-#for AIM_FOLDER in $(ls "$TBT_PATH" | grep "$REGEX_TARGET")
-do
-    #test_print_trc "---Folder For TBT: $AIM_FOLDER"
-    #AIM_FOLDER_INFO=$(udevadm info --attribute-walk --path=${TBT_PATH}/"$AIM_FOLDER")
-    #AIM_FOLDER_PATH=$(echo "$AIM_FOLDER_INFO" | grep looking | head  -n1 | awk -F "'" '{print $2}')
-    #test_print_trc "TBT_FOLDER $AIM_FOLDER real Path: /sys$AIM_FOLDER_PATH"
+  test_print_trc "____________________Now Cheking '$AIM_FILE'___________________"
+
+  aim_folders=$(ls -1 ${TBT_PATH} \
+                | grep "$REGEX_TARGET" \
+                | awk '{ print length(), $0 | "sort -n" }' \
+                | cut -d ' ' -f 2)
+  
+  [ -z "$aim_folders" ] && test_print_trc "AIM floder is not exist" && return 1
+  for AIM_FOLDER in ${aim_folders}; do
     if [ -e "${TBT_PATH}/${AIM_FOLDER}/${AIM_FILE}" ];then
       #test_print_trc "File $AIM_FILE is found on $TBT_PATH/$AIM_FOLDER"
       FILE_INFO=$(cat ${TBT_PATH}/"$AIM_FOLDER"/"$AIM_FILE")
@@ -292,8 +265,8 @@ do
       test_print_trc "File $AIM_FILE is not found or not a file on $TBT_PATH/$AIM_FOLDER"
       continue
     fi
-done
-return $?
+  done
+  return $?
 }
 
 fill_key()
@@ -304,9 +277,10 @@ fill_key()
   local key_path="$HOME/keys"
   local home_key=""
   local verify_key=""
-  cat ${key_path}/${source_key} > ${TBT_PATH}/${aim_folder}/${key_file}
-  home_key=$(cat ${key_path}/${source_key})
-  verify_key=$(cat ${TBT_PATH}/${aim_folder}/${key_file})
+
+  cat "$key_path"/"$source_key" > "$TBT_PATH"/"$aim_folder"/"$key_file"
+  home_key=$(cat "$key_path"/"$source_key")
+  verify_key=$(cat "$TBT_PATH"/"$aim_folder"/"$key_file")
   test_print_trc "${key_path}/${source_key}:$home_key"
   test_print_trc "${TBT_PATH}/${aim_folder}/${key_file}:$verify_key"
 }
@@ -328,14 +302,14 @@ verify_key_file()
     if [ $return_result -ne 0 ]; then
       test_print_trc "Return_result: $return_result"
       fill_key "${aim_folder}.key" "$aim_folder"
-      echo 1 > ${TBT_PATH}/${aim_folder}/${author_file}
+      echo 1 > "${TBT_PATH}/${aim_folder}/${author_file}"
       sleep 3
     else
       fill_key "${aim_folder}.key" "$aim_folder"
       test_print_trc "fill 2 into ${TBT_PATH}/${aim_folder}/${author_file}:"
-      echo 2 > ${TBT_PATH}/${aim_folder}/${author_file}
+      echo 2 > "${TBT_PATH}/${aim_folder}/${author_file}"
       sleep 3
-      author_result=$(cat ${TBT_PATH}/${aim_folder}/${author_file})
+      author_result=$(cat "${TBT_PATH}/${aim_folder}/${author_file}")
       test_print_trc "${TBT_PATH}/${aim_folder}/${author_file}:$author_result"
     fi
   else
@@ -354,26 +328,21 @@ check_security_mode()
 
 check_device_file()
 {
-#for DEVICE_FILE in "${DEVICE_FILES[@]}"
-for DEVICE_FILE in ${DEVICE_FILES}
-do
-  check_device_sysfs "$REGEX_DEVICE" "$DEVICE_FILE"
-done
-test_print_trc "Check power sysfs files"
+  for DEVICE_FILE in ${DEVICE_FILES}; do
+    check_device_sysfs "$REGEX_DEVICE" "$DEVICE_FILE"
+  done
+  test_print_trc "Check power sysfs files"
 
-for POWER_FILE in ${POWER_FILES}
-do
-  check_device_sysfs "$REGEX_DEVICE" "$POWER_FILE"
-done
+  for POWER_FILE in ${POWER_FILES}; do
+    check_device_sysfs "$REGEX_DEVICE" "$POWER_FILE"
+  done
 }
 
 check_domain_file()
 {
-#for DOMAIN_FILE in "${DOMAIN_FILES[@]}"
-for DOMAIN_FILE in ${DOMAIN_FILES}
-do
-  check_device_sysfs "$REGEX_DOMAIN" "$DOMAIN_FILE"
-done
+  for DOMAIN_FILE in ${DOMAIN_FILES}; do
+    check_device_sysfs "$REGEX_DOMAIN" "$DOMAIN_FILE"
+  done
 }
 
 check_32bytes_key()
@@ -430,17 +399,17 @@ wrong_password_check()
 
     check_32bytes_key "${key_path}/${error_key}"
     if [ -e "${key_path}/${aim_folder}.key" ]; then
-      compare=$(diff ${key_path}/${error_key} ${key_path}/${aim_folder}.key)
+      compare=$(diff "${key_path}/${error_key}" "${key_path}/${aim_folder}.key")
       if [ -z "$compare" ]; then
         test_print_trc "${key_path}/${error_key} the same as correct one, regenerate"
-        openssl rand -hex 32 > ${key_path}/${error_key}
+        openssl rand -hex 32 > "${key_path}/${error_key}"
       fi
     fi
     fill_key "$error_key" "$aim_folder"
     test_print_trc "fill 2 into ${TBT_PATH}/${aim_folder}/${author_file}:"
-    echo 2 > ${TBT_PATH}/${aim_folder}/${author_file}
+    echo 2 > "${TBT_PATH}/${aim_folder}/${author_file}"
     sleep 1
-    author_result=$(cat ${TBT_PATH}/${aim_folder}/${author_file})
+    author_result=$(cat "${TBT_PATH}/${aim_folder}/${author_file}")
     if [ "$author_result" == "0" ]; then
       test_print_trc "${TBT_PATH}/${aim_folder}/${author_file}:$author_result passed"
     else
@@ -494,7 +463,7 @@ secure_mode_test()
   [ -d "$key_path" ] || mkdir "$key_path"
 
   for((i=1; i<=time; i++)); do
-    result=$(grep -H . ${author_path} 2>/dev/null |awk -F ':' '{print $NF}' | grep 0)
+    result=$(grep -H . "$author_path" 2>/dev/null |awk -F ':' '{print $NF}' | grep 0)
     if [ -z "$result" ]; then
       test_print_trc "authorized all ok"
       break
@@ -534,7 +503,7 @@ topo_view()
   local device_num=""
 
   # Get tbt sys file in connection order
-  tbt_sys=$(ls -l ${TBT_PATH}/${domainx}*${tn} 2>/dev/null \
+  tbt_sys=$(ls -l ${TBT_PATH}/"$domainx"*"$tn" 2>/dev/null \
             | grep "-" \
             | awk '{ print length(), $0 | "sort -n" }' \
             | tail -n 1 \
@@ -549,18 +518,16 @@ topo_view()
   # Get last file
   last=$(echo "$tbt_sys" | awk '{print $NF}')
   device_num=$(echo "$tbt_sys" | awk '{print NF-1}')
-  #echo "$domainx-$tn contain $device_num tbt devices."
-  #echo "$domainx-$tn contain $device_num tbt devices." >> $TOPO_FILE
 
   # Last file not add <-> in the end
   for tbt_file in ${tbt_sys}; do
     device_file=""
     if [ "$tbt_file" == "$last" ]; then
-      device_file=$(cat ${TBT_PATH}/${tbt_file}/${dev_name} 2>/dev/null)
+      device_file=$(cat "${TBT_PATH}/${tbt_file}/${dev_name}" 2>/dev/null)
       device_topo=${device_topo}${device_file}
       file_topo=${file_topo}${tbt_file}
     else
-      device_file=$(cat ${TBT_PATH}/${tbt_file}/${dev_name} 2>/dev/null)
+      device_file=$(cat "${TBT_PATH}/${tbt_file}/${dev_name}" 2>/dev/null)
       [[ -n "$device_file" ]] || device_file="no_name"
       # For alignment for such as 0-0 and device name, device name is longer
       device_file_num=${#device_file}
@@ -579,9 +546,8 @@ topo_view()
       fi
     fi
   done
-  #echo "device_topo: $device_topo"
+
   echo "device_topo: $device_topo" >> $TOPO_FILE
-  #echo "file_topo  : $file_topo"
   echo "file_topo  : $file_topo" >> $TOPO_FILE
 }
 
@@ -606,11 +572,11 @@ topo_name()
   for tbt_file in ${tbt_sys}; do
     device_file=""
     if [ "$tbt_file" == "$last" ]; then
-      device_file=$(cat ${TBT_PATH}/${tbt_file}/${dev_name} 2>/dev/null)
+      device_file=$(cat "${TBT_PATH}/${tbt_file}/${dev_name}" 2>/dev/null)
       device_topo=${device_topo}${device_file}
       file_topo=${file_topo}${tbt_file}
     else
-      device_file=$(cat ${TBT_PATH}/${tbt_file}/${dev_name} 2>/dev/null)
+      device_file=$(cat "${TBT_PATH}/${tbt_file}/${dev_name}" 2>/dev/null)
       [[ -n "$device_file" ]] || device_file="no_name"
       # For alignment for such as 0-0 and device name, device name is longer
       device_file_num=${#device_file}
@@ -645,7 +611,7 @@ usb4_view()
   local dev_item=""
   local check_point=""
 
-  ls -l ${TBT_PATH}/${domainx}*${tn} 2>/dev/null \
+  ls -l "$TBT_PATH"/"$domainx"*"$tn" 2>/dev/null \
     | grep "-" \
     | awk -F "${REGEX_DOMAIN}${domainx}/" '{print $2}' \
     | awk '{ print length(), $0 | "sort -n" }' \
@@ -710,7 +676,7 @@ tbt_dev_name()
   do
     for dev in $line; do
       cp=""
-      cp=$(cat ${DEV_LIST}_${domainx}_${tn} | grep "$dev")
+      cp=$(cat ${DEV_LIST}_"$domainx"_"$tn" | grep "$dev")
       [[ -z "$cp" ]] || continue
       [[ "$dev" == *"-0" ]] && continue
       echo "$dev" >> "${DEV_LIST}_${domainx}_${tn}"
@@ -719,7 +685,7 @@ tbt_dev_name()
 
   # Get tbt dev file in connection order
   tbt_devs=""
-  tbt_devs=$(cat ${DEV_LIST}_${domainx}_${tn})
+  tbt_devs=$(cat "$DEV_LIST"_"$domainx"_"$tn")
 
   for tbt_dev in $tbt_devs; do
     echo "$tbt_dev" >> "$TBT_DEV_FILE"
