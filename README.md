@@ -1,3 +1,16 @@
+# Authorize and show tbt devices automatically:
+```
+./verify_tbt_sysfs.sh
+...
+0-1 contains 0 tbt devices.
+0-3 contains 1 tbt devices.
+device_topo: USB4 Host Router <-> ThinkPad Thunderbolt 3 Dock
+file_topo  : 0-0              <-> 0-3
+```
+
+
+---
+
 tbt_cases.sh is just a text file which saved the tbt driver cases.
 pdf.sh is a script to generate the pdf for tbt_cases.sh or some other text file.
 Thanks Westerberg Mika's advice!
