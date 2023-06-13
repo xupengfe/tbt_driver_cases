@@ -2,13 +2,38 @@
 ```
 ./verify_tbt_sysfs.sh
 ...
-0-1 contains 0 tbt devices.
-0-3 contains 1 tbt devices.
-device_topo: USB4 Host Router <-> ThinkPad Thunderbolt 3 Dock
-file_topo  : 0-0              <-> 0-3
+0-1 contains 2 tbt devices.
+device_topo: no_name <-> AKiTiO Thunder3 Duo Pro <-> ThinkPad Thunderbolt 3 Dock
+file_topo  : 0-0     <-> 0-1                     <-> 0-101
+0-3 contains 0 tbt devices.
+1-1 contains 0 tbt devices.
+1-3 contains 0 tbt devices.
+
+|20230613-111233.433494150|TRACE|Discrete or FW CM on TGLS,root:0000:00:07.0, /sys/devices/pci0000:00/0000:00:07.0|
+|20230613-111233.436216796|TRACE|TBT ROOT:0000:00:07.0 SYS_PATH:/sys/devices/pci0000:00/0000:00:07.0|
+PF_BIOS: platform, ROOT_PCI:0000:00:07.0
+Upstream pci:0000:02:00.0
+Upstream pci:0000:06:00.0
+0-1:AKiTiO Thunder3 Duo Pro
+ |-> /dev/sdb HDD pci-04:00 INTEL_SSDSC2BW080A4_BTDA337402UU0806GN
+0-101:ThinkPad Thunderbolt 3 Dock
+ |-> /dev/sda USB2.0 pci-08:00 Netac_OnlyDisk_2A9E6BA269ED54332A5F5B92
+ |-> /dev/sdc USB3.0 pci-08:00 SanDisk_Cruzer_Glide_3.0_4C530001320801100511
+```
+## Could use usb4 swich to control 1 USB3/4 device plug or unplug
+```
+usb4switch: https://mcci.com/usb/dev-tools/model-3141/ 
+cd usb4switch3141/
+./usb4switch.sh  [1|2|0 or off|s|h|*]
+  1    Connect host port to port 1 with super speed
+  2    Connect host port to port 2 with super speed
+  0|off  Disconned all ports with host port
+  s    Check current status
+  hot  One round port 1, 2 and disconnect test
+  h|*  Show this and show status
 ```
 
-
+## Some other tips
 ---
 
 tbt_cases.sh is just a text file which saved the tbt driver cases.
