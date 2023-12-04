@@ -940,6 +940,10 @@ check_tbt_us_pci()
 test_print_trc "lspci -t: $pci_result"
 check_device_file
 check_domain_file
+
+echo "grep -H . /sys/bus/thunderbolt/devices/0-?/* 2>/dev/null"
+grep -H . /sys/bus/thunderbolt/devices/0-?/* 2>/dev/null
+
 topo_tbt_show
 tbt_main
 echo
